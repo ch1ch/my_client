@@ -1,0 +1,23 @@
+{
+    "project_type": "javascript",
+    "debugMode" : 0,    
+    "showFPS" : false,
+    "frameRate" : 60,
+    "noCache" : false,
+    "id" : "gameCanvas",
+    "renderMode" : 0,
+    "engineDir":"frameworks/cocos2d-html5",
+
+    "modules" : ["cocos2d", "extensions"],
+
+    "jsList" : [
+        "src/resource.js",
+        "src/app.js",
+        "src/SushiSprite.js",
+        "src/StartScene.js",
+        "src/StageScene.js",
+        "src/PlayScene.js",
+        "src/CreateScene.js"
+        
+    ]
+}
