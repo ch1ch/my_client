@@ -54,7 +54,7 @@
 
 cc.game.onStart = function(){
     if(!cc.sys.isNative && document.getElementById("cocosLoading")) //If referenced loading.js, please remove it
-        document.body.removeChild(document.getElementById("cocosLoading"));
+     document.body.removeChild(document.getElementById("cocosLoading"));
 
     // Pass true to enable retina display, on Android disabled by default to improve performance
     cc.view.enableRetina(cc.sys.os === cc.sys.OS_IOS ? true : false);
@@ -73,7 +73,7 @@ cc.game.onStart = function(){
     // cc.screen.requestFullScreen(targetElement, onFullScreenCallback);
     //load resources
     cc.LoaderScene.preload(g_resources, function () {
-        cc.director.runScene(new StageScene(1));
+        cc.director.runScene(new PlayScene(1));
     }, this);
 };
 cc.game.run();

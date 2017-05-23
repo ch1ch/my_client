@@ -7,17 +7,6 @@
 
           var size = cc.winSize;
 
-          // this.scoreLabel = new cc.LabelTTF("传传 14 丸子 布布", "Arial", 40);
-          // this.scoreLabel.attr({
-          //     x:50,
-          //     y:size.height*0.5,
-          //     rotation: 90
-          // });
-          // this.scoreLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
-          // this.addChild(this.scoreLabel, 35);
-
-          //cc.audioEngine.playMusic("res/sound/bgm.mp3", true ); 
-
           cc.spriteFrameCache.addSpriteFrames(res.ani_plist);
 
 
@@ -43,13 +32,8 @@
           });
           this.addChild(this.title_, 5);
           this.title_.opacity = 0;
-          // var fadeout = new cc.fadeOut(0);   
-          // this.title_.runAction(fadeout.reverse());  
 
-         
-
-          //w_title_bg
-
+          
           var startItem = new cc.MenuItemImage(
             res.star1_png,
             res.start2_png,
