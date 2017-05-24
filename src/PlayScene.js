@@ -5,7 +5,7 @@ var PlayLayer = cc.Layer.extend({
   touchx:null,
   touchy:null,
   score:null,
-  paitypecn:["一万","二万","三万","四万","五万","六万","七万","八万","九万","一条","二条","三条","四条","五条","六条","七条","八条","九条","一筒","二筒","三筒","四筒","五筒","六筒","七筒","八筒","九筒","东","南","西","北","红","财","白"],
+  paitypecn:["一万","二万","三万","四万","五万","六万","七万","八万","九万","一条","二条","三条","四条","五条","六条","七条","八条","九条","一筒","二筒","三筒","四筒","五筒","六筒","七筒","八筒","九筒","东","南","西","北","红","發","白"],
   paitype:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,33],
   player1:[],
   player2:[],
@@ -44,7 +44,7 @@ var PlayLayer = cc.Layer.extend({
       
       var firstload=true;
       // add bg
-      this.bgSprite = new cc.Sprite(res.s_bg);
+      this.bgSprite = new cc.Sprite(res.p_bk);
       this.bgSprite.attr({
           x: size.width / 2,
           y: size.height / 2,
@@ -106,15 +106,9 @@ var PlayLayer = cc.Layer.extend({
         _this["player"+j+"list"][_this.allpai[i]]++;
       };
     };
+    initPlayer1();
 
-    function sortNumber(a,b)
-    {
-      return a - b;
-    }
-    // _this.player1.sort(sortNumber);
-    // _this.player2.sort(sortNumber);
-    // _this.player3.sort(sortNumber);
-    // _this.player4.sort(sortNumber);
+
 
     // console.log(_this.player1);
     // console.log(_this.player2);
@@ -135,6 +129,9 @@ var PlayLayer = cc.Layer.extend({
     console.log(_this.CanHuPai(test));
   },
 
+  initPlayer1:function(){
+
+  }
 
   CanHuPai__7pair:function (arr){
     var pairCount=0;
