@@ -15,6 +15,10 @@ var PlayLayer = cc.Layer.extend({
   player2list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   player3list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   player4list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  player1pai:[],
+  player2pai:[],
+  player3pai:[],
+  player4pai:[],
   allpai:new Array(136),
   Mahjongtiles_info:{  
     userID:-1,                   //对应用户ID  
@@ -106,11 +110,11 @@ var PlayLayer = cc.Layer.extend({
         _this["player"+j+"list"][_this.allpai[i]]++;
       };
     };
-    initPlayer1();
+    this.initPlayer1();
 
 
 
-    // console.log(_this.player1);
+    console.log(_this.player1);
     // console.log(_this.player2);
     // console.log(_this.player3);
     // console.log(_this.player4);
@@ -130,8 +134,43 @@ var PlayLayer = cc.Layer.extend({
   },
 
   initPlayer1:function(){
+    var _this=this;
+    var posx=60;
+    var posy=70;
+    // 以秒为单位的时间间隔
+    var interval = 0.3;
+     // 重复次数
+    var repeat = 14;
+     // 开始延时
+    var delay = 1;
+    var i=0;
+    this.schedule(function() {
+      console.log(i);
+         // 这里的 this 指向 component
+      var thing = new cc.Sprite(res["p_pai"+_this.player1[i]]);
+      if (i==13) {
+         posx+=20;
+      };
+      var x = posx;
+      var y = posy;
+      posx+=90;
+      thing.attr({
+          x: x,
+          y:y,
+      });
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(85/thing.getContentSize().width);
+      thing.setScaleY(120/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player1pai.push(thing);     
+      i++;
+    }, interval, repeat, delay);
 
-  }
+    // for (var i = 0; i < _this.player1.length; i++) {
+    //   // _this.player1[i]
+     
+    // };
+  },
 
   CanHuPai__7pair:function (arr){
     var pairCount=0;
