@@ -13,7 +13,7 @@
     "jsList" : [
         "src/resource.js",
         "src/app.js",
-        "src/SushiSprite.js",
+        "src/PaiSprite.js",
         "src/StartScene.js",
         "src/StageScene.js",
         "src/PlayScene.js",

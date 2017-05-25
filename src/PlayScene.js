@@ -114,7 +114,7 @@ var PlayLayer = cc.Layer.extend({
 
 
 
-    console.log(_this.player1);
+    //console.log(_this.player1);
     // console.log(_this.player2);
     // console.log(_this.player3);
     // console.log(_this.player4);
@@ -138,16 +138,16 @@ var PlayLayer = cc.Layer.extend({
     var posx=60;
     var posy=70;
     // 以秒为单位的时间间隔
-    var interval = 0.3;
+    var interval = 0.1;
      // 重复次数
     var repeat = 14;
      // 开始延时
-    var delay = 1;
+    var delay = 0.5;
     var i=0;
     this.schedule(function() {
-      console.log(i);
+      //console.log(i);
          // 这里的 this 指向 component
-      var thing = new cc.Sprite(res["p_pai"+_this.player1[i]]);
+      var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
       if (i==13) {
          posx+=20;
       };
@@ -157,6 +157,7 @@ var PlayLayer = cc.Layer.extend({
       thing.attr({
           x: x,
           y:y,
+          paitype:_this.player1[i]
       });
       thing.setAnchorPoint(0.5,0.5);
       thing.setScaleX(85/thing.getContentSize().width);
@@ -164,13 +165,54 @@ var PlayLayer = cc.Layer.extend({
       _this.addChild(thing,15);
       _this.player1pai.push(thing);     
       i++;
+      if (i==14) {
+        _this.sortPai(false);
+      };
     }, interval, repeat, delay);
-
     // for (var i = 0; i < _this.player1.length; i++) {
     //   // _this.player1[i]
      
     // };
   },
+
+  sortPai:function(isout){
+    var _this=this;
+    //console.log(_this.player1);
+    function sortNumber(a,b){
+      return a - b;
+    }
+    _this.player1.sort(sortNumber);
+
+    console.log(_this);
+    console.log(cc);
+    for (var i = _this.player1pai.length - 2; i >= 0; i--) {
+      _this.player1pai[i].removeFromParent();
+      _this.player1pai[i] = undefined;
+      _this.player1pai.splice(i,1);
+    };
+    var posx=60;
+    var posy=70;
+    for (var i = 0; i < _this.player1.length-1; i++) {
+      var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
+      var x = posx;
+      var y = posy;
+      posx+=90;
+      thing.attr({
+          x: x,
+          y:y,
+          paitype:_this.player1[i],
+          callback:_this.sortPai
+      });
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(85/thing.getContentSize().width);
+      thing.setScaleY(120/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player1pai.push(thing);
+    };
+  },
+
+
+
 
   CanHuPai__7pair:function (arr){
     var pairCount=0;

@@ -1,5 +1,6 @@
- var SushiSprite = cc.Sprite.extend({
+ var PaiSprite = cc.Sprite.extend({
  	disappearAction:null,//消失动画
+ 	paitype:null,
     onEnter:function () {
          //cc.log("onEnter");
         this._super();
@@ -30,8 +31,9 @@
 	                target.stopAllActions();
 	                var ac = target.disappearAction;
                     var seqAc = cc.Sequence.create( ac, cc.CallFunc.create(function () {
-                        cc.log("callfun........");
+                        console.log(target.paitype);
                         target.removeFromParent();
+                       // target.callback();
                     },target) );
     				target.runAction(seqAc);
 
