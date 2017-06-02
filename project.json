@@ -17,7 +17,8 @@
         "src/StartScene.js",
         "src/StageScene.js",
         "src/PlayScene.js",
-        "src/CreateScene.js"
+        "src/CreateScene.js",
+         "lib/jrand.js"
         
     ]
 }

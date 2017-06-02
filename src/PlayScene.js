@@ -1,3 +1,4 @@
+
 var PlayLayer = cc.Layer.extend({
   bgSprite:null,
   scoreLabel:null,
@@ -69,6 +70,15 @@ var PlayLayer = cc.Layer.extend({
       this.scoreLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
       this.addChild(this.scoreLabel, 35);
 
+
+      this.center = new cc.Sprite(res.p_ui_center);
+      this.center.attr({
+         x: size.width*0.5,
+         y: size.height *0.5,
+      });
+      this.addChild(this.center, 5);
+      // this.center.opacity = 0;
+
   }, 
 
   //初始化
@@ -87,12 +97,12 @@ var PlayLayer = cc.Layer.extend({
       };
     };
     _this.allpai=_this.Arrayshuffle(_this.allpai);
-    
 
-    for (var i = 0; i < _this.allpai.length; i++) {
-      //console.log( _this.paitypecn[_this.allpai[i]]);
-    };
+    // for (var i = 0; i < _this.allpai.length; i++) {
+    //   //console.log( _this.paitypecn[_this.allpai[i]]);
+    // };
     //console.log(_this.allpai);
+    //console.log(_this.allpai.join(','));
     _this.initPlayerPai();
   },
 
@@ -129,8 +139,8 @@ var PlayLayer = cc.Layer.extend({
     //   };
     //   console.log(str);
     // };
-    var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    console.log(_this.CanHuPai(test));
+  //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+   // console.log(_this.CanHuPai(test));
   },
 
   initPlayer1:function(){
@@ -142,31 +152,32 @@ var PlayLayer = cc.Layer.extend({
      // 重复次数
     var repeat = 14;
      // 开始延时
-    var delay = 0.5;
+    var delay = 0.1;
     var i=0;
     this.schedule(function() {
       //console.log(i);
          // 这里的 this 指向 component
       var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
-      if (i==13) {
+      if (i==14) {
          posx+=20;
       };
+     
       var x = posx;
       var y = posy;
-      posx+=90;
+      posx+=84;
       thing.attr({
           x: x,
           y:y,
           paitype:_this.player1[i]
       });
       thing.setAnchorPoint(0.5,0.5);
-      thing.setScaleX(85/thing.getContentSize().width);
+      thing.setScaleX(76/thing.getContentSize().width);
       thing.setScaleY(120/thing.getContentSize().height);
       _this.addChild(thing,15);
       _this.player1pai.push(thing);     
       i++;
-      if (i==14) {
-        _this.sortPai(false);
+      if (i==15) {
+        _this.sortPai(false,true);
       };
     }, interval, repeat, delay);
     // for (var i = 0; i < _this.player1.length; i++) {
@@ -175,16 +186,14 @@ var PlayLayer = cc.Layer.extend({
     // };
   },
 
-  sortPai:function(isout){
+  sortPai:function(isout,isfirst){
     var _this=this;
-    //console.log(_this.player1);
     function sortNumber(a,b){
       return a - b;
     }
     _this.player1.sort(sortNumber);
 
-    console.log(_this);
-    console.log(cc);
+
     for (var i = _this.player1pai.length - 2; i >= 0; i--) {
       _this.player1pai[i].removeFromParent();
       _this.player1pai[i] = undefined;
@@ -192,11 +201,16 @@ var PlayLayer = cc.Layer.extend({
     };
     var posx=60;
     var posy=70;
-    for (var i = 0; i < _this.player1.length-1; i++) {
+    var pailen=isfirst?14:13;
+    for (var i = 0; i < pailen; i++) {
       var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
+      if (i==13) {
+         posx+=20;
+      };
       var x = posx;
       var y = posy;
       posx+=90;
+
       thing.attr({
           x: x,
           y:y,
@@ -209,6 +223,8 @@ var PlayLayer = cc.Layer.extend({
       _this.addChild(thing,15);
       _this.player1pai.push(thing);
     };
+    console.log(_this.player1.length);
+   
   },
 
 

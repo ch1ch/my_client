@@ -44,6 +44,7 @@ var res = {
     p_pai31:"res/play/pai/z.png",
     p_pai32:"res/play/pai/f.png",
     p_pai33:"res/play/pai/b.png",
+    p_ui_center:"res/play/ui/center.png",
 
 
 
