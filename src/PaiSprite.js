@@ -31,12 +31,13 @@
 	                target.stopAllActions();
 	                var ac = target.disappearAction;
                     var seqAc = cc.Sequence.create( ac, cc.CallFunc.create(function () {
-                        console.log(target.paitype);
-                        target.removeFromParent();
-                       // target.callback();
+                        //target.removeFromParent();
+                        target.callback(target.num);
                     },target) );
-    				target.runAction(seqAc);
-
+                    if (window.isPlay) {
+	    				target.runAction(seqAc);
+	    				window.isPlay=false;
+                    };
 	                target.opacity = 180;
 	                return true;
 	            }

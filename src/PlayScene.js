@@ -20,7 +20,9 @@ var PlayLayer = cc.Layer.extend({
   player2pai:[],
   player3pai:[],
   player4pai:[],
+  isPlay:false,
   allpai:new Array(136),
+  painum:0,
   Mahjongtiles_info:{  
     userID:-1,                   //对应用户ID  
     in_Pai:new Array(34),        //手里的牌序列  
@@ -35,7 +37,6 @@ var PlayLayer = cc.Layer.extend({
     PaiList:new Array(136),    //麻将队列  
   
   },
-
 
   ctor:function (stagenum) {
       this._super();
@@ -71,21 +72,40 @@ var PlayLayer = cc.Layer.extend({
       this.addChild(this.scoreLabel, 35);
 
 
-      this.center = new cc.Sprite(res.p_ui_center);
-      this.center.attr({
+      // this.center = new cc.Sprite(res.p_ui_center);
+      // this.center.attr({
+      //    x: size.width*0.5,
+      //    y: size.height *0.5,
+      // });
+      // this.addChild(this.center, 5);
+
+
+      var centerItem = new cc.MenuItemImage(
+        res.p_ui_center,
+        res.p_ui_center,
+        function () {
+          //console.log("Menu is clicked!");
+          _this.AddPai();
+          
+        }, this);
+      centerItem.attr({
          x: size.width*0.5,
          y: size.height *0.5,
+         anchorX: 0.5,
+         anchorY: 0.5
       });
-      this.addChild(this.center, 5);
-      // this.center.opacity = 0;
+      var centermenu = new cc.Menu(centerItem);
+      centermenu.x = 0;
+      centermenu.y = 0;
+      this.addChild(centermenu, 35);
 
   }, 
 
   //初始化
   initPai:function(){
     var _this=this;
-    //console.log( _this.paitype);
-    //console.log( _this.paitypecn);
+    window.isPlay=false;
+    window.playscene=_this;
     for (var i = 0,j=0,k=0; i <136 ; i++) {
       if (k<4) {
         k++;
@@ -98,10 +118,6 @@ var PlayLayer = cc.Layer.extend({
     };
     _this.allpai=_this.Arrayshuffle(_this.allpai);
 
-    // for (var i = 0; i < _this.allpai.length; i++) {
-    //   //console.log( _this.paitypecn[_this.allpai[i]]);
-    // };
-    //console.log(_this.allpai);
     //console.log(_this.allpai.join(','));
     _this.initPlayerPai();
   },
@@ -119,26 +135,10 @@ var PlayLayer = cc.Layer.extend({
         _this["player"+j].push(_this.allpai[i]);
         _this["player"+j+"list"][_this.allpai[i]]++;
       };
+      _this.painum++;
     };
     this.initPlayer1();
 
-
-
-    //console.log(_this.player1);
-    // console.log(_this.player2);
-    // console.log(_this.player3);
-    // console.log(_this.player4);
-    // console.log(_this.player1list);
-    // console.log(_this.player2list);
-    // console.log(_this.player3list);
-    // console.log(_this.player4list);
-    // for (var i = 1; i < 5; i++) {
-    //   var str="";
-    //   for (var j = 0; j < 13; j++) {
-    //     str+= _this.paitypecn[_this["player"+i][j]]+" ";
-    //   };
-    //   console.log(str);
-    // };
   //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
    // console.log(_this.CanHuPai(test));
   },
@@ -146,7 +146,6 @@ var PlayLayer = cc.Layer.extend({
   initPlayer1:function(){
     var _this=this;
     var posx=60;
-    var posy=70;
     // 以秒为单位的时间间隔
     var interval = 0.1;
      // 重复次数
@@ -155,36 +154,22 @@ var PlayLayer = cc.Layer.extend({
     var delay = 0.1;
     var i=0;
     this.schedule(function() {
-      //console.log(i);
-         // 这里的 this 指向 component
-      var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
+      // 这里的 this 指向 component
       if (i==14) {
          posx+=20;
       };
-     
+     // console.log(posx);
       var x = posx;
-      var y = posy;
-      posx+=84;
-      thing.attr({
-          x: x,
-          y:y,
-          paitype:_this.player1[i]
-      });
-      thing.setAnchorPoint(0.5,0.5);
-      thing.setScaleX(76/thing.getContentSize().width);
-      thing.setScaleY(120/thing.getContentSize().height);
-      _this.addChild(thing,15);
-      _this.player1pai.push(thing);     
+      posx+=90;
+      _this.showPai(i,x);
       i++;
       if (i==15) {
         _this.sortPai(false,true);
+        window.isPlay=true;
       };
     }, interval, repeat, delay);
-    // for (var i = 0; i < _this.player1.length; i++) {
-    //   // _this.player1[i]
-     
-    // };
   },
+
 
   sortPai:function(isout,isfirst){
     var _this=this;
@@ -192,42 +177,68 @@ var PlayLayer = cc.Layer.extend({
       return a - b;
     }
     _this.player1.sort(sortNumber);
+    var delpailength=isout?15:15;
+    console.log(_this.player1pai.length);
 
-
-    for (var i = _this.player1pai.length - 2; i >= 0; i--) {
-      _this.player1pai[i].removeFromParent();
-      _this.player1pai[i] = undefined;
-      _this.player1pai.splice(i,1);
+    for (var i =delpailength - 2; i >= 0; i--) {
+      if (typeof  _this.player1pai[i] != "undefined"){
+        _this.player1pai[i].removeFromParent();
+        _this.player1pai[i] = undefined;
+        _this.player1pai.splice(i,1);
+      }
+     
     };
     var posx=60;
-    var posy=70;
     var pailen=isfirst?14:13;
     for (var i = 0; i < pailen; i++) {
-      var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
       if (i==13) {
-         posx+=20;
+       posx+=20;
       };
       var x = posx;
-      var y = posy;
       posx+=90;
-
-      thing.attr({
-          x: x,
-          y:y,
-          paitype:_this.player1[i],
-          callback:_this.sortPai
-      });
-      thing.setAnchorPoint(0.5,0.5);
-      thing.setScaleX(85/thing.getContentSize().width);
-      thing.setScaleY(120/thing.getContentSize().height);
-      _this.addChild(thing,15);
-      _this.player1pai.push(thing);
+      _this.showPai(i,x);
     };
-    console.log(_this.player1.length);
+    console.log("-------");
    
   },
 
+  showPai:function(i,posx){
+    var _this=this;
+    var posy=70;
+    var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
+    thing.attr({
+        x: posx,
+        y:posy,
+        paitype:_this.player1[i],
+        callback:_this.outPai,
+        num:i
+    });
+    thing.setAnchorPoint(0.5,0.5);
+    thing.setScaleX(85/thing.getContentSize().width);
+    thing.setScaleY(120/thing.getContentSize().height);
+    _this.addChild(thing,15);
+    _this.player1pai.push(thing);
+    //console.log(_this.player1pai.length);
 
+  },
+
+  outPai:function(num){
+    console.log(window.playscene.player1pai.length);
+    window.playscene.player1pai[13].removeFromParent();
+    window.playscene.player1pai[13] = undefined;
+    window.playscene.player1pai.splice(13,1);
+    window.playscene.player1.splice(num,1);
+    window.playscene.sortPai(true);
+  },
+
+  AddPai:function(){
+    var _this=this;
+    _this.painum++;
+    _this["player1"].push(_this.allpai[_this.painum]);
+     _this.showPai(13,1260);
+     window.isPlay=true;
+    console.log(_this.player1pai.length);
+  },
 
 
   CanHuPai__7pair:function (arr){
@@ -683,37 +694,6 @@ var PlayLayer = cc.Layer.extend({
     return ret;  
   },
 
-
-
-
-  //起牌  
-  AddPai:function(){
-  
-  },
-  //取得对应的牌在牌墙的索引  
-  GetPaiIndex:function(){
-       
-  },
-  //删除牌  
-  DelPai:function(){
-       
-  },
-  //清空牌  
-  CleanUp:function(){
-       
-  },
-   //检测是否胡牌  
-  CheckAllPai:function(){
-       
-  },
-  //对所有的牌进行输出  
-  PrintAllPai:function(){
-       
-  },
-   //对一张牌进行输出  
-  PrintPai:function(){
-       
-  },
   //吃牌
   CheckChiPai : function() {
 
