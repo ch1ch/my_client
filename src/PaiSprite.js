@@ -32,7 +32,7 @@
 	                var ac = target.disappearAction;
                     var seqAc = cc.Sequence.create( ac, cc.CallFunc.create(function () {
                         //target.removeFromParent();
-                        target.callback(target.num);
+                        target.callback(target.num,target.paitype);
                     },target) );
                     if (window.isPlay) {
 	    				target.runAction(seqAc);

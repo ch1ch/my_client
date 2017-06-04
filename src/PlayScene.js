@@ -20,6 +20,10 @@ var PlayLayer = cc.Layer.extend({
   player2pai:[],
   player3pai:[],
   player4pai:[],
+  player1outpai:[],
+  player2outpai:[],
+  player3outpai:[],
+  player4outpai:[],
   isPlay:false,
   allpai:new Array(136),
   painum:0,
@@ -272,18 +276,21 @@ var PlayLayer = cc.Layer.extend({
       };
       _this.painum++;
     };
-    this.initPlayer1();
-    this.initPlayer2();
-    this.initPlayer3();
-    this.initPlayer4();
+    this.initPlayer();
+    // this.initPlayer2();
+    // this.initPlayer3();
+    // this.initPlayer4();
 
   //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
    // console.log(_this.CanHuPai(test));
   },
 
-  initPlayer1:function(){
+  initPlayer:function(){
     var _this=this;
     var p1_posx=60;
+    var p2_posy=660;
+    var p3_posx=420;
+    var p4_posy=690;
     // 以秒为单位的时间间隔
     var interval = 0.1;
      // 重复次数
@@ -294,9 +301,16 @@ var PlayLayer = cc.Layer.extend({
     this.schedule(function() {
       // 这里的 this 指向 component
       if (i==14) {
-         p1_posx+=20;
+        p1_posx+=20;
+      }else if (i!=13){
+        p2_posy-=37;
+        _this.initPlayer2(p2_posy);
+        p3_posx+=41;
+        _this.initPlayer3(p3_posx);
+        p4_posy-=37;
+        _this.initPlayer4(p4_posy);
+
       };
-     // console.log(p1_posx);
       var p1_x = p1_posx;
       p1_posx+=90;
       _this.showPai(i,p1_x);
@@ -308,13 +322,13 @@ var PlayLayer = cc.Layer.extend({
     }, interval, repeat, delay);
   },
 
-  initPlayer2:function(){
+  initPlayer2:function(posy){
     var _this=this;
     var posx=230;
-    var posy=660;
-    for (var i = 0; i < 13; i++) {
+    // var posy=660;
+    // for (var i = 0; i < 13; i++) {
       var thing = new cc.Sprite(res.p_ui_rightpai);
-      posy-=37;
+     
       thing.attr({
         x: posx,
         y:posy,
@@ -326,16 +340,16 @@ var PlayLayer = cc.Layer.extend({
       thing.setScaleY(36/thing.getContentSize().height);
       _this.addChild(thing,15);
       _this.player2pai.push(thing);
-    };
+    // };
   },
 
-  initPlayer3:function(){
+  initPlayer3:function(posx){
     var _this=this;
-    var posx=420;
+    // var posx=420;
     var posy=670;
-    for (var i = 0; i < 13; i++) {
+    // for (var i = 0; i < 13; i++) {
       var thing = new cc.Sprite(res.p_ui_backpai);
-      posx+=41;
+      
       thing.attr({
         x: posx,
         y:posy,
@@ -346,16 +360,16 @@ var PlayLayer = cc.Layer.extend({
       thing.setScaleY(54/thing.getContentSize().height);
       _this.addChild(thing,15);
       _this.player3pai.push(thing);
-    };
+    // };
   },
 
-  initPlayer4:function(){
+  initPlayer4:function(posy){
     var _this=this;
     var posx=1090;
-    var posy=690;
-    for (var i = 0; i < 13; i++) {
+    // var posy=690;
+    // for (var i = 0; i < 13; i++) {
       var thing = new cc.Sprite(res.p_ui_rightpai);
-      posy-=37;
+      // posy-=37;
       thing.attr({
         x: posx,
         y:posy,
@@ -366,7 +380,7 @@ var PlayLayer = cc.Layer.extend({
       thing.setScaleY(36/thing.getContentSize().height);
       _this.addChild(thing,15);
       _this.player4pai.push(thing);
-    };
+    // };
   
   },
 
@@ -422,12 +436,13 @@ var PlayLayer = cc.Layer.extend({
 
   },
 
-  outPai:function(num){
-    console.log(window.playscene.player1pai.length);
+  outPai:function(num,paitype){
+    // console.log(window.playscene.player1pai.length);
     window.playscene.player1pai[13].removeFromParent();
     window.playscene.player1pai[13] = undefined;
     window.playscene.player1pai.splice(13,1);
     window.playscene.player1.splice(num,1);
+    window.playscene.show_P1outPai(paitype);
     window.playscene.sortPai(true);
   },
 
@@ -438,6 +453,25 @@ var PlayLayer = cc.Layer.extend({
      _this.showPai(13,1260);
      window.isPlay=true;
     console.log(_this.player1pai.length);
+  },
+
+  show_P1outPai:function(paitype){
+    console.log(paitype);
+    var _this=this;
+    var outlength=_this.player1outpai.length;
+    var posy=250;
+    var posx=420+outlength*46;
+    var thing = new cc.Sprite(res["p_pai"+paitype]);
+    thing.attr({
+        x: posx,
+        y:posy
+    });
+    thing.setAnchorPoint(0.5,0.5);
+    thing.setScaleX(45/thing.getContentSize().width);
+    thing.setScaleY(60/thing.getContentSize().height);
+    _this.addChild(thing,15);
+    _this.player1outpai.push(thing);
+    
   },
 
 
