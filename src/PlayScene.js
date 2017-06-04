@@ -282,7 +282,7 @@ var PlayLayer = cc.Layer.extend({
     // this.initPlayer4();
 
   //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-   // console.log(_this.CanHuPai(test));
+    //console.log(_this.player1list);
   },
 
   initPlayer:function(){
@@ -443,6 +443,7 @@ var PlayLayer = cc.Layer.extend({
     window.playscene.player1pai.splice(13,1);
     window.playscene.player1.splice(num,1);
     window.playscene.show_P1outPai(paitype);
+    window.playscene.player1list[paitype]--;
     window.playscene.sortPai(true);
   },
 
@@ -452,7 +453,8 @@ var PlayLayer = cc.Layer.extend({
     _this["player1"].push(_this.allpai[_this.painum]);
      _this.showPai(13,1260);
      window.isPlay=true;
-    console.log(_this.player1pai.length);
+    _this.player1list[this.allpai[_this.painum]]++;
+    console.log(_this.player1list);
   },
 
   show_P1outPai:function(paitype){
