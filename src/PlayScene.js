@@ -61,15 +61,13 @@ var PlayLayer = cc.Layer.extend({
       this.bgSprite.setScaleY(size.height/this.bgSprite.getContentSize().height);
       this.addChild(this.bgSprite, 0);
 
-      this.scoreLabel = new cc.LabelTTF("0", "Arial", 70);
-      this.scoreLabel.attr({
-          x:136,
-          y:686,
-          
-      });
-
-      this.scoreLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
-      this.addChild(this.scoreLabel, 35);
+      // this.scoreLabel = new cc.LabelTTF("0", "Arial", 70);
+      // this.scoreLabel.attr({
+      //     x:136,
+      //     y:686,
+      // });
+      // this.scoreLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
+      // this.addChild(this.scoreLabel, 35);
 
 
       // this.center = new cc.Sprite(res.p_ui_center);
@@ -78,8 +76,7 @@ var PlayLayer = cc.Layer.extend({
       //    y: size.height *0.5,
       // });
       // this.addChild(this.center, 5);
-
-
+     
       var centerItem = new cc.MenuItemImage(
         res.p_ui_center,
         res.p_ui_center,
@@ -99,6 +96,44 @@ var PlayLayer = cc.Layer.extend({
       centermenu.y = 0;
       this.addChild(centermenu, 35);
 
+      var backItem = new cc.MenuItemImage(
+        res.p_ui_back,
+        res.p_ui_back,
+        function () {
+          console.log("back is clicked!");
+          
+        }, this);
+      backItem.attr({
+         x: size.width*0.93,
+         y: size.height *0.93,
+         anchorX: 0.5,
+         anchorY: 0.5
+      });
+      var backmenu = new cc.Menu(backItem);
+      backmenu.x = 0;
+      backmenu.y = 0;
+      this.addChild(backmenu, 35);
+
+
+      var infoItem = new cc.MenuItemImage(
+        res.p_ui_info,
+        res.p_ui_info,
+        function () {
+          console.log("back is clicked!");
+          
+        }, this);
+      infoItem.attr({
+         x: 0,
+         y: size.height ,
+         anchorX: 0,
+         anchorY: 1
+      });
+      var infomenu = new cc.Menu(infoItem);
+      infomenu.x = 0;
+      infomenu.y = 0;
+      this.addChild(infomenu, 35);
+
+      _this.initPlayerinfo();
   }, 
 
   //初始化
@@ -120,6 +155,106 @@ var PlayLayer = cc.Layer.extend({
 
     //console.log(_this.allpai.join(','));
     _this.initPlayerPai();
+   
+  },
+
+  initPlayerinfo:function(){
+    var _this=this;
+    var header1="res/play/ui/header.png";
+    var name1="张三";
+    var header2="res/play/ui/header.png";
+    var name2="张si";
+    var header3="res/play/ui/header.png";
+    var name3="张wu";
+    var header4="res/play/ui/header.png";
+    var name4="张liu";
+     var size = cc.winSize;
+    //player1
+    var player1head = new cc.Sprite(header1);
+    player1head.attr({
+       x: 140,
+       y: 190,
+    });
+    player1head.setScaleX(90/player1head.getContentSize().width);
+    player1head.setScaleY(90/player1head.getContentSize().height);
+    this.addChild(player1head, 5);
+
+
+    this.player1nameLabel = new cc.LabelTTF(name1, "Arial", 24);
+    this.player1nameLabel.attr({
+        x:90,
+        y:190,
+        anchorX: 1,
+        anchorY: 0.5
+    });
+    this.player1nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+    this.addChild(this.player1nameLabel, 35);
+
+    //player2
+    var player2head = new cc.Sprite(header2);
+    player2head.attr({
+       x: 60,
+       y: 480,
+       anchorX: 0,
+    });
+    player2head.setScaleX(90/player2head.getContentSize().width);
+    player2head.setScaleY(90/player2head.getContentSize().height);
+    this.addChild(player2head, 5);
+
+    this.player2nameLabel = new cc.LabelTTF(name2, "Arial", 24);
+    this.player2nameLabel.attr({
+        x:60,
+        y:410,
+        anchorX: 0,
+        anchorY: 0.5
+    });
+    this.player2nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+    this.addChild(this.player2nameLabel, 35);
+
+    //player3
+    var player3head = new cc.Sprite(header3);
+    player3head.attr({
+      x: size.width*0.26,
+      y: size.height *0.9,
+       anchorX: 0,
+    });
+    player3head.setScaleX(90/player3head.getContentSize().width);
+    player3head.setScaleY(90/player3head.getContentSize().height);
+    this.addChild(player3head, 5);
+
+    this.player3nameLabel = new cc.LabelTTF(name3, "Arial", 24);
+    this.player3nameLabel.attr({
+      x: size.width*0.26,
+      y: size.height *0.81,
+      anchorX: 0,
+      anchorY: 0.5
+    });
+    this.player3nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+    this.addChild(this.player3nameLabel, 35);
+
+    //player4
+    var player4head = new cc.Sprite(header4);
+    player4head.attr({
+      x: size.width*0.9,
+      y: size.height *0.65,
+       anchorX: 0,
+    });
+    player4head.setScaleX(90/player4head.getContentSize().width);
+    player4head.setScaleY(90/player4head.getContentSize().height);
+    this.addChild(player4head, 5);
+
+    this.player4nameLabel = new cc.LabelTTF(name4, "Arial", 24);
+    this.player4nameLabel.attr({
+      x: size.width*0.9,
+      y: size.height *0.56,
+      anchorX: 0,
+      anchorY: 0.5
+    });
+    this.player4nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+    this.addChild(this.player4nameLabel, 35);
+
+
+
   },
 
   initPlayerPai:function(){
@@ -138,6 +273,9 @@ var PlayLayer = cc.Layer.extend({
       _this.painum++;
     };
     this.initPlayer1();
+    this.initPlayer2();
+    this.initPlayer3();
+    this.initPlayer4();
 
   //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
    // console.log(_this.CanHuPai(test));
@@ -145,7 +283,7 @@ var PlayLayer = cc.Layer.extend({
 
   initPlayer1:function(){
     var _this=this;
-    var posx=60;
+    var p1_posx=60;
     // 以秒为单位的时间间隔
     var interval = 0.1;
      // 重复次数
@@ -156,18 +294,80 @@ var PlayLayer = cc.Layer.extend({
     this.schedule(function() {
       // 这里的 this 指向 component
       if (i==14) {
-         posx+=20;
+         p1_posx+=20;
       };
-     // console.log(posx);
-      var x = posx;
-      posx+=90;
-      _this.showPai(i,x);
+     // console.log(p1_posx);
+      var p1_x = p1_posx;
+      p1_posx+=90;
+      _this.showPai(i,p1_x);
       i++;
       if (i==15) {
         _this.sortPai(false,true);
         window.isPlay=true;
       };
     }, interval, repeat, delay);
+  },
+
+  initPlayer2:function(){
+    var _this=this;
+    var posx=230;
+    var posy=660;
+    for (var i = 0; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      posy-=37;
+      thing.attr({
+        x: posx,
+        y:posy,
+        anchorX: 0,
+        anchorY: 0.5,
+        rotation: 180
+      });
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player2pai.push(thing);
+    };
+  },
+
+  initPlayer3:function(){
+    var _this=this;
+    var posx=420;
+    var posy=670;
+    for (var i = 0; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_backpai);
+      posx+=41;
+      thing.attr({
+        x: posx,
+        y:posy,
+        anchorX: 0,
+        anchorY: 0.5,
+      });
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player3pai.push(thing);
+    };
+  },
+
+  initPlayer4:function(){
+    var _this=this;
+    var posx=1090;
+    var posy=690;
+    for (var i = 0; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      posy-=37;
+      thing.attr({
+        x: posx,
+        y:posy,
+        anchorX: 0,
+        anchorY: 0.5
+      });
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player4pai.push(thing);
+    };
+  
   },
 
 

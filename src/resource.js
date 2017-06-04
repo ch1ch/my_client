@@ -44,8 +44,13 @@ var res = {
     p_pai31:"res/play/pai/z.png",
     p_pai32:"res/play/pai/f.png",
     p_pai33:"res/play/pai/b.png",
-    p_ui_center:"res/play/ui/center.png",
 
+    p_ui_center:"res/play/ui/center.png",
+    p_ui_back:"res/play/ui/back.png",
+    p_ui_info:"res/play/ui/info.png",
+    p_ui_header:"res/play/ui/header.png",
+    p_ui_rightpai:"res/play/ui/rightpai.png",
+    p_ui_backpai:"res/play/ui/backpai.png",
 
 
     game_bg:"res/ui/bg.jpg",
