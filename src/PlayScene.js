@@ -1,5 +1,8 @@
-
+var SocketIO = SocketIO || io;
 var PlayLayer = cc.Layer.extend({
+  _statusLabel:null,
+    _broadcastLabel:null,
+    _sioClient:null,
   bgSprite:null,
   scoreLabel:null,
   circleSprites1:null,
@@ -45,8 +48,6 @@ var PlayLayer = cc.Layer.extend({
   ctor:function (stagenum) {
       this._super();
       var _this=this;
-      _this.initPai();
-
       this.score=0;
       var timecount=0.01;//刷新频率
 
@@ -81,65 +82,182 @@ var PlayLayer = cc.Layer.extend({
       // });
       // this.addChild(this.center, 5);
      
-      var centerItem = new cc.MenuItemImage(
-        res.p_ui_center,
-        res.p_ui_center,
-        function () {
-          //console.log("Menu is clicked!");
-          _this.AddPai();
+      // var centerItem = new cc.MenuItemImage(
+      //   res.p_ui_center,
+      //   res.p_ui_center,
+      //   function () {
+      //     //console.log("Menu is clicked!");
+      //     _this.AddPai();
           
-        }, this);
-      centerItem.attr({
-         x: size.width*0.5,
-         y: size.height *0.5,
-         anchorX: 0.5,
-         anchorY: 0.5
-      });
-      var centermenu = new cc.Menu(centerItem);
-      centermenu.x = 0;
-      centermenu.y = 0;
-      this.addChild(centermenu, 35);
+      //   }, this);
+      // centerItem.attr({
+      //    x: size.width*0.5,
+      //    y: size.height *0.5,
+      //    anchorX: 0.5,
+      //    anchorY: 0.5
+      // });
+      // var centermenu = new cc.Menu(centerItem);
+      // centermenu.x = 0;
+      // centermenu.y = 0;
+      // this.addChild(centermenu, 35);
 
-      var backItem = new cc.MenuItemImage(
-        res.p_ui_back,
-        res.p_ui_back,
-        function () {
-          console.log("back is clicked!");
+      // var backItem = new cc.MenuItemImage(
+      //   res.p_ui_back,
+      //   res.p_ui_back,
+      //   function () {
+      //     console.log("back is clicked!");
           
-        }, this);
-      backItem.attr({
-         x: size.width*0.93,
-         y: size.height *0.93,
-         anchorX: 0.5,
-         anchorY: 0.5
-      });
-      var backmenu = new cc.Menu(backItem);
-      backmenu.x = 0;
-      backmenu.y = 0;
-      this.addChild(backmenu, 35);
+      //   }, this);
+      // backItem.attr({
+      //    x: size.width*0.93,
+      //    y: size.height *0.93,
+      //    anchorX: 0.5,
+      //    anchorY: 0.5
+      // });
+      // var backmenu = new cc.Menu(backItem);
+      // backmenu.x = 0;
+      // backmenu.y = 0;
+      // this.addChild(backmenu, 35);
 
 
-      var infoItem = new cc.MenuItemImage(
-        res.p_ui_info,
-        res.p_ui_info,
-        function () {
-          console.log("back is clicked!");
+      // var infoItem = new cc.MenuItemImage(
+      //   res.p_ui_info,
+      //   res.p_ui_info,
+      //   function () {
+      //     console.log("back is clicked!");
           
-        }, this);
-      infoItem.attr({
-         x: 0,
-         y: size.height ,
-         anchorX: 0,
-         anchorY: 1
+      //   }, this);
+      // infoItem.attr({
+      //    x: 0,
+      //    y: size.height ,
+      //    anchorX: 0,
+      //    anchorY: 1
+      // });
+      // var infomenu = new cc.Menu(infoItem);
+      // infomenu.x = 0;
+      // infomenu.y = 0;
+      // this.addChild(infomenu, 35);
+
+
+     
+      //_this.initPlayerinfo();
+      // _this.initPai();
+      _this.initLayer();
+  },
+
+    onExit: function() {
+        if(this._sioEndpoint) this._sioEndpoint.disconnect();
+        if(this._sioClient) this._sioClient.disconnect();
+
+        this._super();
+    },
+   initLayer:function() {
+      var size = cc.winSize;
+
+        var menuRequest = new cc.Menu();
+        menuRequest.setPosition(cc.p(0, 0));
+        this.addChild(menuRequest);
+        var winSize = cc.director.getWinSize();
+        MARGIN = 40;
+        var SPACE = 35;
+        var vspace = 80;
+
+          // Test to create basic client in the default namespace
+        var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 22);
+        labelSIOClient.setAnchorPoint(cc.p(0,0));
+        var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
+        itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
+        menuRequest.addChild(itemSIOClient);
+
+        // Test to create a client at the endpoint '/testpoint'
+        var labelSIOEndpoint = new cc.LabelTTF("Open SocketIO Endpoint", "Arial", 22);
+        labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
+        var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.onMenuSIOEndpointClicked, this);
+        itemSIOEndpoint.setPosition(cc.p(winSize.width - (labelSIOEndpoint.getContentSize().width / 2 + MARGIN), winSize.height - MARGIN - SPACE));
+        menuRequest.addChild(itemSIOEndpoint);
+
+        // Test sending message to default namespace
+        var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 22);
+        labelTestMessage.setAnchorPoint(cc.p(0,0));
+        var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
+        itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
+        menuRequest.addChild(itemTestMessage);
+
+        // Test sending event 'echotest' to default namespace
+        var labelTestEvent = new cc.LabelTTF("test ajax", "Arial", 22);
+        labelTestEvent.setAnchorPoint(cc.p(0,0));
+        var itemTestEvent = new cc.MenuItemLabel(labelTestEvent, this.testAjaxClicked, this);
+        itemTestEvent.setPosition(cc.p(labelTestEvent.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 3 * SPACE));
+        menuRequest.addChild(itemTestEvent);
+
+
+        this.sockt_server="ws://127.0.0.1:3010/12345";
+        this.roomID=12345;
+        this.openid=4567897789;
+    },
+
+    testevent: function(data) {
+        var msg = this.tag + " says 'testevent' with data: " + data;
+        console.log(msg);
+    },
+
+    message: function(data) {
+        var msg = this.tag + " received message: " + data;
+        console.log(msg);
+    },
+
+    disconnection: function() {
+        var msg = this.tag + " disconnected!";
+        console.log(msg);
+    },
+    onMenuSIOClientClicked: function(sender) {
+      var _this=this;
+      var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});
+
+        sioclient.on("connect", function() {
+            // var msg = " Connected!";
+            // var roominfo={type:'room',roomid:'12345'};
+            // sioclient.send(roominfo);
+            console.log('Connected!');
+            sioclient.emit('join', _this.openid,_this.roomID);
+        });
+
+        sioclient.on("message", this.message);
+
+        sioclient.on("echotest", function(data) {
+            var msg =  " says 'echotest' with data: " + data;
+            console.log(msg);
+        });
+
+        sioclient.on("testevent", this.testevent);
+
+        sioclient.on("disconnect", this.disconnection);
+
+        sioclient.on('sys', function (sysMsg, users) {
+          console.log(sysMsg,users);
+        });  
+
+        sioclient.on('msg', function (userName, msg) {
+          console.log(userName,msg);        
+        });
+
+        this._sioClient = sioclient;
+
+    },
+
+    onMenuTestMessageClicked: function(sender) {
+
+        if(this._sioClient != null) this._sioClient.send("Hello Socket.IO!");
+    },
+
+    testAjaxClicked: function(sender) {
+      Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+        console.log(res);
       });
-      var infomenu = new cc.Menu(infoItem);
-      infomenu.x = 0;
-      infomenu.y = 0;
-      this.addChild(infomenu, 35);
+       
 
-      _this.initPlayerinfo();
-  }, 
-
+    },
+ 
   //初始化
   initPai:function(){
     var _this=this;
