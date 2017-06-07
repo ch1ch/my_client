@@ -141,7 +141,7 @@ var PlayLayer = cc.Layer.extend({
 
      
       //_this.initPlayerinfo();
-      // _this.initPai();
+      _this.initPai();
       _this.initLayer();
   },
 
@@ -192,7 +192,7 @@ var PlayLayer = cc.Layer.extend({
 
 
         this.sockt_server="ws://127.0.0.1:3010/12345";
-        this.roomID=12345;
+        this.roomID=35503;
         this.openid=4567897789;
     },
 
@@ -241,19 +241,32 @@ var PlayLayer = cc.Layer.extend({
           console.log(userName,msg);        
         });
 
+        sioclient.on('roominfo', function (userName, msg) {
+          console.log(userName,msg);        
+        });        
+
         this._sioClient = sioclient;
 
     },
 
     onMenuTestMessageClicked: function(sender) {
 
-        if(this._sioClient != null) this._sioClient.send("Hello Socket.IO!");
+        if(this._sioClient != null) {
+          this._sioClient.send("Hello Socket.IO!");
+        }
     },
 
     testAjaxClicked: function(sender) {
-      Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+      // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+      //   console.log(res);
+      // });
+      var time=Date.now();
+        var gametype=1;
+        var rule='123';
+         var openid='12345';
+      Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
-      });
+      });      
        
 
     },
@@ -273,10 +286,11 @@ var PlayLayer = cc.Layer.extend({
         _this.allpai[i]=_this.paitype[j];
       };
     };
+   // console.log( _this.allpai.join(','));
     _this.allpai=_this.Arrayshuffle(_this.allpai);
 
     //console.log(_this.allpai.join(','));
-    _this.initPlayerPai();
+    //_this.initPlayerPai();
    
   },
 
