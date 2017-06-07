@@ -75,12 +75,12 @@ var PlayLayer = cc.Layer.extend({
       // this.addChild(this.scoreLabel, 35);
 
 
-      // this.center = new cc.Sprite(res.p_ui_center);
-      // this.center.attr({
+      // var center = new cc.Sprite(res.p_ui_center);
+      // .center.attr({
       //    x: size.width*0.5,
       //    y: size.height *0.5,
       // });
-      // this.addChild(this.center, 5);
+      // this.addChild(center, 5);
      
       // var centerItem = new cc.MenuItemImage(
       //   res.p_ui_center,
@@ -140,9 +140,10 @@ var PlayLayer = cc.Layer.extend({
 
 
      
-      //_this.initPlayerinfo();
+      _this.initPlayerinfo();
       _this.initPai();
-      _this.initLayer();
+      //_this.initLayer();
+      _this.showChoose();
   },
 
     onExit: function() {
@@ -290,7 +291,7 @@ var PlayLayer = cc.Layer.extend({
     _this.allpai=_this.Arrayshuffle(_this.allpai);
 
     //console.log(_this.allpai.join(','));
-    //_this.initPlayerPai();
+    _this.initPlayerPai();
    
   },
 
@@ -304,7 +305,7 @@ var PlayLayer = cc.Layer.extend({
     var name3="张wu";
     var header4="res/play/ui/header.png";
     var name4="张liu";
-     var size = cc.winSize;
+    var size = cc.winSize;
     //player1
     var player1head = new cc.Sprite(header1);
     player1head.attr({
@@ -388,9 +389,6 @@ var PlayLayer = cc.Layer.extend({
     });
     this.player4nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
     this.addChild(this.player4nameLabel, 35);
-
-
-
   },
 
   initPlayerPai:function(){
@@ -514,6 +512,16 @@ var PlayLayer = cc.Layer.extend({
       _this.player4pai.push(thing);
     // };
   
+  },
+
+  showChoose:function(){
+    var choose = new cc.Sprite(res.p_ui_choose);
+    var size = cc.winSize;
+    choose.attr({
+       x: size.width*0.5,
+       y: size.height *0.3,
+    });
+    this.addChild(choose, 5);
   },
 
 

@@ -51,6 +51,14 @@ var res = {
     p_ui_header:"res/play/ui/header.png",
     p_ui_rightpai:"res/play/ui/rightpai.png",
     p_ui_backpai:"res/play/ui/backpai.png",
+    
+    p_ui_choose:"res/play/ui/choose.png",
+    p_ui_chooseview_peng:"res/play/ui/peng.png",
+    p_ui_chooseview_ting:"res/play/ui/ting.png",
+    p_ui_chooseview_hu:"res/play/ui/hu.png",
+    p_ui_chooseview_gang:"res/play/ui/gang.png",
+    p_ui_chooseview_zimo:"res/play/ui/zimo.png",
+
 
 
     game_bg:"res/ui/bg.jpg",
