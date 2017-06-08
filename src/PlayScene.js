@@ -9,6 +9,7 @@ var PlayLayer = cc.Layer.extend({
   touchx:null,
   touchy:null,
   score:null,
+  choose:null,
   paitypecn:["一万","二万","三万","四万","五万","六万","七万","八万","九万","一条","二条","三条","四条","五条","六条","七条","八条","九条","一筒","二筒","三筒","四筒","五筒","六筒","七筒","八筒","九筒","东","南","西","北","红","發","白"],
   paitype:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,33],
   player1:[],
@@ -82,24 +83,24 @@ var PlayLayer = cc.Layer.extend({
       // });
       // this.addChild(center, 5);
      
-      // var centerItem = new cc.MenuItemImage(
-      //   res.p_ui_center,
-      //   res.p_ui_center,
-      //   function () {
-      //     //console.log("Menu is clicked!");
-      //     _this.AddPai();
+      var centerItem = new cc.MenuItemImage(
+        res.p_ui_center,
+        res.p_ui_center,
+        function () {
+          //console.log("Menu is clicked!");
+          _this.AddPai();
           
-      //   }, this);
-      // centerItem.attr({
-      //    x: size.width*0.5,
-      //    y: size.height *0.5,
-      //    anchorX: 0.5,
-      //    anchorY: 0.5
-      // });
-      // var centermenu = new cc.Menu(centerItem);
-      // centermenu.x = 0;
-      // centermenu.y = 0;
-      // this.addChild(centermenu, 35);
+        }, this);
+      centerItem.attr({
+         x: size.width*0.5,
+         y: size.height *0.5,
+         anchorX: 0.5,
+         anchorY: 0.5
+      });
+      var centermenu = new cc.Menu(centerItem);
+      centermenu.x = 0;
+      centermenu.y = 0;
+      this.addChild(centermenu, 35);
 
       // var backItem = new cc.MenuItemImage(
       //   res.p_ui_back,
@@ -140,10 +141,12 @@ var PlayLayer = cc.Layer.extend({
 
 
      
-      //_this.initPlayerinfo();
-     // _this.initPai();
-      _this.initLayer();
-      _this.showChoose();
+      _this.initPlayerinfo();
+     _this.initPai();
+     
+      
+
+       _this.initLayer();
   },
 
     onExit: function() {
@@ -458,6 +461,8 @@ var PlayLayer = cc.Layer.extend({
       };
       _this.painum++;
     };
+     _this.player1=[9,9,9,10,11,12,13,14,15,16,17,17,17,18];
+    _this.player1list=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,1,1,1,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     this.initPlayer();
     // this.initPlayer2();
     // this.initPlayer3();
@@ -567,16 +572,133 @@ var PlayLayer = cc.Layer.extend({
   },
 
   showChoose:function(){
-    var choose = new cc.Sprite(res.p_ui_choose);
+    this.choose = new cc.Sprite(res.p_ui_choose);
     var size = cc.winSize;
-    choose.attr({
+    this.choose.attr({
        x: size.width*0.5,
        y: size.height *0.3,
     });
-    this.addChild(choose, 5);
+    this.addChild(this.choose, 15);
   },
 
+  checkChoose:function(paitype){
+    var _this=this;
+     var size = cc.winSize;
+    var ishu=_this.CanHuPai(_this.player1list);
+    console.log(_this.player1list);
+    var isgang=_this.player1list[paitype]>3?true:false;
+    var ispeng=_this.player1list[paitype]>2?true:false;
+    console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
+     ishu=true;
+     isgang=true;
+     ispeng=true;
+    if (ishu || isgang || ispeng) {
+    }else{
+      return false;
+    };
+    
+    if (ishu) {
+       var hu = new cc.MenuItemImage(
+        res.p_ui_chooseview_hu,
+        res.p_ui_chooseview_hu,
+        function () {
+          _this.doHu(paitype);
+        }, this);
+      hu.attr({
+        x: size.width*0.95,
+        y: size.height *0.0,
+        anchorX: 0.5,
+         anchorY: 1.4
+      });
+      var _hu = new cc.Menu(hu);
+      _hu.x = size.width*0.1;
+      _hu.y = 0;
+      _hu.setScaleX(146/hu.getContentSize().width);
+      _hu.setScaleY(90/hu.getContentSize().height);
+      this.addChild(_hu, 35,'gang');
 
+      // var hu = new cc.Sprite(res.p_ui_chooseview_hu);
+      // hu.attr({
+      //    x: size.width*0.75,
+      //    y: size.height *0.23,
+      // });
+      // hu.setScaleX(146/hu.getContentSize().width);
+      // hu.setScaleY(90/hu.getContentSize().height);
+      // this.addChild(hu, 25,'hu');
+    }
+
+    if (isgang) {
+      // var gang = new cc.Sprite(res.p_ui_chooseview_gang);
+      // gang.attr({
+      //    x: size.width*0.66,
+      //    y: size.height *0.22,
+      // });
+      // gang.setScaleX(136/gang.getContentSize().width);
+      // gang.setScaleY(120/gang.getContentSize().height);
+      // this.addChild(gang, 25,'gang');
+
+      var gang = new cc.MenuItemImage(
+        res.p_ui_chooseview_gang,
+        res.p_ui_chooseview_gang,
+        function () {
+          _this.doGang(paitype);
+        }, this);
+      gang.attr({
+        x: size.width*0.84,
+        y: size.height *0.07,
+        anchorX: 0.5,
+         anchorY: 1
+      });
+      var _gang = new cc.Menu(gang);
+      _gang.x = 0;
+      _gang.y = 0;
+      _gang.setScaleX(136/gang.getContentSize().width);
+      _gang.setScaleY(120/gang.getContentSize().height);
+      this.addChild(_gang, 35,'gang');
+    }
+
+    if (ispeng) {
+      var peng = new cc.MenuItemImage(
+        res.p_ui_chooseview_peng,
+        res.p_ui_chooseview_peng,
+        function () {
+          _this.doPeng(paitype);
+        }, this);
+      peng.attr({
+        x: size.width*0.64,
+        y: size.height *0.07,
+        anchorX: 0.5,
+         anchorY: 1
+      });
+      var _peng = new cc.Menu(peng);
+      _peng.x = 0;
+      _peng.y = 0;
+      _peng.setScaleX(136/peng.getContentSize().width);
+      _peng.setScaleY(120/peng.getContentSize().height);
+      this.addChild(_peng, 35,'gang');
+
+      //   var peng =  new cc.Sprite(res.p_ui_chooseview_peng);
+      //   peng.setAnchorPoint(cc.p(0,0));
+      //   var _peng = new cc.MenuItemLabel(peng, this.doPeng(paitype), this);
+      //   _peng.setPosition( size.width*0.57,size.height *0.23);
+      //   _peng.setScaleX(136/_peng.getContentSize().width);
+      // _peng.setScaleY(120/_peng.getContentSize().height);
+      //  this.addChild(_peng,25,'gang');
+    }
+
+    return true;
+     
+  },
+
+  doPeng:function(paitype){
+    console.log('peng',paitype);
+  },
+  doGang:function(paitype){
+    console.log('gang',paitype);
+  },
+  doHu:function(paitype){
+    console.log('hu',paitype);
+  },
   sortPai:function(isout,isfirst){
     var _this=this;
     function sortNumber(a,b){
@@ -647,6 +769,7 @@ var PlayLayer = cc.Layer.extend({
      window.isPlay=true;
     _this.player1list[this.allpai[_this.painum]]++;
     console.log(_this.player1list);
+    _this.checkChoose(_this.allpai[_this.painum]);
   },
 
   show_P1outPai:function(paitype){
@@ -662,13 +785,13 @@ var PlayLayer = cc.Layer.extend({
     });
     thing.setAnchorPoint(0.5,0.5);
     thing.setScaleX(45/thing.getContentSize().width);
-    thing.setScaleY(60/thing.getContentSize().height);
-    _this.addChild(thing,15);
+    thing.setScaleY(64/thing.getContentSize().height);
+    _this.addChild(thing,5);
     _this.player1outpai.push(thing);
     
   },
 
-
+ 
   CanHuPai__7pair:function (arr){
     var pairCount=0;
     /*七对*/  

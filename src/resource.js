@@ -54,10 +54,15 @@ var res = {
     
     p_ui_choose:"res/play/ui/choose.png",
     p_ui_chooseview_peng:"res/play/ui/peng.png",
-    p_ui_chooseview_ting:"res/play/ui/ting.png",
     p_ui_chooseview_hu:"res/play/ui/hu.png",
     p_ui_chooseview_gang:"res/play/ui/gang.png",
     p_ui_chooseview_zimo:"res/play/ui/zimo.png",
+    p_ui_chooseview_peng_s:"res/play/ui/peng_s.png",
+    p_ui_chooseview_hu_s:"res/play/ui/hu_s.png",
+    p_ui_chooseview_gang_s:"res/play/ui/gang_s.png",
+    p_ui_chooseview_peng_m:"res/play/ui/peng_m.png",
+    p_ui_chooseview_hu_m:"res/play/ui/hu_m.png",
+    p_ui_chooseview_gang_m:"res/play/ui/gang_m.png",
 
 
 
