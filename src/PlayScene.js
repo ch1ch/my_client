@@ -189,7 +189,14 @@ var PlayLayer = cc.Layer.extend({
         labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
         var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
         itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
-        menuRequest.addChild(itemSIOEndpoint);        
+        menuRequest.addChild(itemSIOEndpoint);     
+
+
+        var label5 = new cc.LabelTTF("out 1", "Arial", 38);
+        label5.setAnchorPoint(cc.p(0,0));
+        var label5l = new cc.MenuItemLabel(label5, this._outPai, this);
+        label5l.setPosition(cc.p(label5.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 5 * SPACE));
+        menuRequest.addChild(label5l);       
 
 
         this.sockt_server="ws://127.0.0.1:3010/12345";
@@ -225,12 +232,6 @@ var PlayLayer = cc.Layer.extend({
 
         sioclient.on("message", this.message);
 
-        sioclient.on("echotest", function(data) {
-            var msg =  " says 'echotest' with data: " + data;
-            console.log(msg);
-        });
-
-        sioclient.on("testevent", this.testevent);
 
         sioclient.on("disconnect", this.disconnection);
 
@@ -239,11 +240,15 @@ var PlayLayer = cc.Layer.extend({
         });  
 
         sioclient.on('msg', function (userName, msg) {
-          console.log('msg',userName,msg);        
+          console.log('msg',userName,msg);
         });
 
         sioclient.on('roominfo', function (userName, msg) {
-          console.log('roominfo',userName,msg);        
+          console.log('roominfo',userName,msg);
+          //code 2 人齐了可以开始
+          if (msg.code==2) {
+            sioclient.emit('gameinfo',_this.roomID,{code:1}); 
+          };                     
         });
 
         sioclient.on('gameinfo', function (userName, msg) {
@@ -262,23 +267,63 @@ var PlayLayer = cc.Layer.extend({
     },
 
     testAjaxClicked: function(sender) {
-      // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+      var _this=this;
+      var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});      
+      sioclient.on("connect", function() {
+            // var msg = " Connected!";
+            // var roominfo={type:'room',roomid:'12345'};
+            // sioclient.send(roominfo);
+            console.log('Connected!');
+            sioclient.emit('join', 9999,35502);
+        });
+
+        sioclient.on("message", this.message);
+
+
+        sioclient.on("disconnect", this.disconnection);
+
+        sioclient.on('sys', function (sysMsg, users) {
+          console.log('sys',sysMsg,users);
+        });  
+
+        sioclient.on('msg', function (userName, msg) {
+          console.log('msg',userName,msg);
+        });
+
+        
+        sioclient.on('roominfo', function (userName, msg) {
+          console.log('roominfo',userName,msg);
+          if (msg.code==2) {
+
+          };    
+        });
+
+        sioclient.on('gameinfo', function (userName, msg) {
+          console.log('gameinfo',userName,msg);        
+        });
+
+        this._sioClient = sioclient;      
+      // // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+      // //   console.log(res);
+      // // });
+      // var time=Date.now();
+      //   var gametype=1;
+      //   var rule='123';
+      //    var openid='12345';
+      // Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
       //   console.log(res);
-      // });
-      var time=Date.now();
-        var gametype=1;
-        var rule='123';
-         var openid='12345';
-      Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
-        console.log(res);
-      });      
+      // });      
     },
 
     gamestartClicked: function(sender) {
 
        
     },
- 
+
+    _outPai: function(sender) {
+
+       
+    },    
   //初始化
   initPai:function(){
     var _this=this;
