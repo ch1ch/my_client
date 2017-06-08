@@ -140,9 +140,9 @@ var PlayLayer = cc.Layer.extend({
 
 
      
-      _this.initPlayerinfo();
-      _this.initPai();
-      //_this.initLayer();
+      //_this.initPlayerinfo();
+     // _this.initPai();
+      _this.initLayer();
       _this.showChoose();
   },
 
@@ -159,37 +159,37 @@ var PlayLayer = cc.Layer.extend({
         menuRequest.setPosition(cc.p(0, 0));
         this.addChild(menuRequest);
         var winSize = cc.director.getWinSize();
-        MARGIN = 40;
-        var SPACE = 35;
+        MARGIN = 46;
+        var SPACE = 46;
         var vspace = 80;
 
           // Test to create basic client in the default namespace
-        var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 22);
+        var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 38);
         labelSIOClient.setAnchorPoint(cc.p(0,0));
         var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
         itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
         menuRequest.addChild(itemSIOClient);
 
-        // Test to create a client at the endpoint '/testpoint'
-        var labelSIOEndpoint = new cc.LabelTTF("Open SocketIO Endpoint", "Arial", 22);
-        labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
-        var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.onMenuSIOEndpointClicked, this);
-        itemSIOEndpoint.setPosition(cc.p(winSize.width - (labelSIOEndpoint.getContentSize().width / 2 + MARGIN), winSize.height - MARGIN - SPACE));
-        menuRequest.addChild(itemSIOEndpoint);
-
         // Test sending message to default namespace
-        var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 22);
+        var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 38);
         labelTestMessage.setAnchorPoint(cc.p(0,0));
         var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
         itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
         menuRequest.addChild(itemTestMessage);
 
         // Test sending event 'echotest' to default namespace
-        var labelTestEvent = new cc.LabelTTF("test ajax", "Arial", 22);
+        var labelTestEvent = new cc.LabelTTF("test ajax", "Arial", 38);
         labelTestEvent.setAnchorPoint(cc.p(0,0));
         var itemTestEvent = new cc.MenuItemLabel(labelTestEvent, this.testAjaxClicked, this);
         itemTestEvent.setPosition(cc.p(labelTestEvent.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 3 * SPACE));
         menuRequest.addChild(itemTestEvent);
+
+
+        var labelSIOEndpoint = new cc.LabelTTF("start game", "Arial", 38);
+        labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
+        var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
+        itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
+        menuRequest.addChild(itemSIOEndpoint);        
 
 
         this.sockt_server="ws://127.0.0.1:3010/12345";
@@ -235,16 +235,20 @@ var PlayLayer = cc.Layer.extend({
         sioclient.on("disconnect", this.disconnection);
 
         sioclient.on('sys', function (sysMsg, users) {
-          console.log(sysMsg,users);
+          console.log('sys',sysMsg,users);
         });  
 
         sioclient.on('msg', function (userName, msg) {
-          console.log(userName,msg);        
+          console.log('msg',userName,msg);        
         });
 
         sioclient.on('roominfo', function (userName, msg) {
-          console.log(userName,msg);        
-        });        
+          console.log('roominfo',userName,msg);        
+        });
+
+        sioclient.on('gameinfo', function (userName, msg) {
+          console.log('gameinfo',userName,msg);        
+        });
 
         this._sioClient = sioclient;
 
@@ -268,8 +272,11 @@ var PlayLayer = cc.Layer.extend({
       Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
       });      
-       
+    },
 
+    gamestartClicked: function(sender) {
+
+       
     },
  
   //初始化
