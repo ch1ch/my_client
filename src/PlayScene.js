@@ -97,10 +97,10 @@ var PlayLayer = cc.Layer.extend({
          anchorX: 0.5,
          anchorY: 0.5
       });
-      var centermenu = new cc.Menu(centerItem);
-      centermenu.x = 0;
-      centermenu.y = 0;
-      this.addChild(centermenu, 35);
+      // var centermenu = new cc.Menu(centerItem);
+      // centermenu.x = 0;
+      // centermenu.y = 0;
+      // this.addChild(centermenu, 35);
 
       // var backItem = new cc.MenuItemImage(
       //   res.p_ui_back,
@@ -141,11 +141,9 @@ var PlayLayer = cc.Layer.extend({
 
 
      
-      _this.initPlayerinfo();
-     _this.initPai();
+      //_this.initPlayerinfo();
+     //_this.initPai();
      
-      
-
        _this.initLayer();
   },
 
@@ -232,41 +230,8 @@ var PlayLayer = cc.Layer.extend({
             console.log('Connected!');
             sioclient.emit('join', _this.openid,_this.roomID);
         });
-
-        sioclient.on("message", this.message);
-
-
-        sioclient.on("disconnect", this.disconnection);
-
-        sioclient.on('sys', function (sysMsg, users) {
-          console.log('sys',sysMsg,users);
-        });  
-
-        sioclient.on('msg', function (userName, msg) {
-          console.log('msg',userName,msg);
-        });
-
-        sioclient.on('roominfo', function (userName, msg) {
-          console.log('roominfo',userName,msg);
-          //code 2 人齐了可以开始
-          if (msg.code==2) {
-            sioclient.emit('gameinfo',_this.roomID,{code:1}); 
-          };                     
-        });
-
-        sioclient.on('gameinfo', function (userName, msg) {
-          console.log('gameinfo',userName,msg);        
-        });
-
-        this._sioClient = sioclient;
-
-    },
-
-    onMenuTestMessageClicked: function(sender) {
-
-        if(this._sioClient != null) {
-          this._sioClient.send("Hello Socket.IO!");
-        }
+      this._sioClient = sioclient;
+      this.socketinit();
     },
 
     testAjaxClicked: function(sender) {
@@ -277,35 +242,10 @@ var PlayLayer = cc.Layer.extend({
             // var roominfo={type:'room',roomid:'12345'};
             // sioclient.send(roominfo);
             console.log('Connected!');
-            sioclient.emit('join', 9999,35502);
+            sioclient.emit('join', 9999,35503);
         });
-
-        sioclient.on("message", this.message);
-
-
-        sioclient.on("disconnect", this.disconnection);
-
-        sioclient.on('sys', function (sysMsg, users) {
-          console.log('sys',sysMsg,users);
-        });  
-
-        sioclient.on('msg', function (userName, msg) {
-          console.log('msg',userName,msg);
-        });
-
-        
-        sioclient.on('roominfo', function (userName, msg) {
-          console.log('roominfo',userName,msg);
-          if (msg.code==2) {
-
-          };    
-        });
-
-        sioclient.on('gameinfo', function (userName, msg) {
-          console.log('gameinfo',userName,msg);        
-        });
-
-        this._sioClient = sioclient;      
+      this._sioClient = sioclient;
+      this.socketinit();
       // // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
       // //   console.log(res);
       // // });
@@ -317,6 +257,45 @@ var PlayLayer = cc.Layer.extend({
       //   console.log(res);
       // });      
     },
+
+
+    socketinit:function(){
+      var _this=this;
+      var sioclient= _this._sioClient ;
+      sioclient.on("message", this.message);
+
+
+      sioclient.on("disconnect", this.disconnection);
+
+      sioclient.on('sys', function (sysMsg, users) {
+        console.log('sys',sysMsg,users);
+      });  
+
+      sioclient.on('msg', function (userName, msg) {
+        console.log('msg',userName,msg);
+      });
+
+      sioclient.on('roominfo', function (userName, msg) {
+        console.log('roominfo',userName,msg);
+        //code 2 人齐了可以开始
+        if (msg.code==2) {
+          sioclient.emit('gameinfo',_this.roomID,{code:1});
+        };            
+      });
+
+      sioclient.on('gameinfo', function (userName, msg) {
+        console.log('gameinfo',userName,msg);        
+      });
+
+      
+    },
+
+    onMenuTestMessageClicked: function(sender) {
+
+        if(this._sioClient != null) {
+          this._sioClient.send("Hello Socket.IO!");
+        }
+    },    
 
     gamestartClicked: function(sender) {
 
