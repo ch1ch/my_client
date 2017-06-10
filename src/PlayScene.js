@@ -1,8 +1,8 @@
 var SocketIO = SocketIO || io;
 var PlayLayer = cc.Layer.extend({
   _statusLabel:null,
-    _broadcastLabel:null,
-    _sioClient:null,
+  _broadcastLabel:null,
+  _sioClient:null,
   bgSprite:null,
   scoreLabel:null,
   circleSprites1:null,
@@ -13,13 +13,7 @@ var PlayLayer = cc.Layer.extend({
   paitypecn:["一万","二万","三万","四万","五万","六万","七万","八万","九万","一条","二条","三条","四条","五条","六条","七条","八条","九条","一筒","二筒","三筒","四筒","五筒","六筒","七筒","八筒","九筒","东","南","西","北","红","發","白"],
   paitype:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,33],
   player1:[],
-  player2:[],
-  player3:[],
-  player4:[],
   player1list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  player2list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  player3list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  player4list:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   player1pai:[],
   player2pai:[],
   player3pai:[],
@@ -31,21 +25,8 @@ var PlayLayer = cc.Layer.extend({
   isPlay:false,
   allpai:new Array(136),
   painum:0,
-  Mahjongtiles_info:{  
-    userID:-1,                   //对应用户ID  
-    in_Pai:new Array(34),        //手里的牌序列  
-    out_Pai:new Array(34),      //外面的牌序列  
-    sum_Pai:new Array(34),      //总和的牌序列  
-  
-  },
-  Mahjonggame_info:{  
-    player:Array(4),            //四个用户对应的组排  
-    hunPai:-1,                  //混牌  
-    zhuangjia:0,               //庄家  
-    PaiList:new Array(136),    //麻将队列  
-  
-  },
-
+  roomid:0,
+  playerid:0,
   ctor:function (stagenum) {
       this._super();
       var _this=this;
@@ -74,14 +55,6 @@ var PlayLayer = cc.Layer.extend({
       // });
       // this.scoreLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
       // this.addChild(this.scoreLabel, 35);
-
-
-      // var center = new cc.Sprite(res.p_ui_center);
-      // .center.attr({
-      //    x: size.width*0.5,
-      //    y: size.height *0.5,
-      // });
-      // this.addChild(center, 5);
      
       var centerItem = new cc.MenuItemImage(
         res.p_ui_center,
@@ -97,54 +70,53 @@ var PlayLayer = cc.Layer.extend({
          anchorX: 0.5,
          anchorY: 0.5
       });
-      // var centermenu = new cc.Menu(centerItem);
-      // centermenu.x = 0;
-      // centermenu.y = 0;
-      // this.addChild(centermenu, 35);
+      var centermenu = new cc.Menu(centerItem);
+      centermenu.x = 0;
+      centermenu.y = 0;
+      this.addChild(centermenu, 35);
 
-      // var backItem = new cc.MenuItemImage(
-      //   res.p_ui_back,
-      //   res.p_ui_back,
-      //   function () {
-      //     console.log("back is clicked!");
+      var backItem = new cc.MenuItemImage(
+        res.p_ui_back,
+        res.p_ui_back,
+        function () {
+          console.log("back is clicked!");
           
-      //   }, this);
-      // backItem.attr({
-      //    x: size.width*0.93,
-      //    y: size.height *0.93,
-      //    anchorX: 0.5,
-      //    anchorY: 0.5
-      // });
-      // var backmenu = new cc.Menu(backItem);
-      // backmenu.x = 0;
-      // backmenu.y = 0;
-      // this.addChild(backmenu, 35);
+        }, this);
+      backItem.attr({
+         x: size.width*0.93,
+         y: size.height *0.93,
+         anchorX: 0.5,
+         anchorY: 0.5
+      });
+      var backmenu = new cc.Menu(backItem);
+      backmenu.x = 0;
+      backmenu.y = 0;
+      this.addChild(backmenu, 35);
 
 
-      // var infoItem = new cc.MenuItemImage(
-      //   res.p_ui_info,
-      //   res.p_ui_info,
-      //   function () {
-      //     console.log("back is clicked!");
+      var infoItem = new cc.MenuItemImage(
+        res.p_ui_info,
+        res.p_ui_info,
+        function () {
+          console.log("back is clicked!");
           
-      //   }, this);
-      // infoItem.attr({
-      //    x: 0,
-      //    y: size.height ,
-      //    anchorX: 0,
-      //    anchorY: 1
-      // });
-      // var infomenu = new cc.Menu(infoItem);
-      // infomenu.x = 0;
-      // infomenu.y = 0;
-      // this.addChild(infomenu, 35);
+        }, this);
+      infoItem.attr({
+         x: 0,
+         y: size.height ,
+         anchorX: 0,
+         anchorY: 1
+      });
+      var infomenu = new cc.Menu(infoItem);
+      infomenu.x = 0;
+      infomenu.y = 0;
+      this.addChild(infomenu, 35);
 
 
-     
-      //_this.initPlayerinfo();
-     //_this.initPai();
-     
-       _this.initLayer();
+     //玩家信息
+      _this.initPlayerinfo();
+      // _this.initPai();
+      _this.initLayer();
   },
 
     onExit: function() {
@@ -158,7 +130,7 @@ var PlayLayer = cc.Layer.extend({
 
         var menuRequest = new cc.Menu();
         menuRequest.setPosition(cc.p(0, 0));
-        this.addChild(menuRequest);
+        this.addChild(menuRequest,50);
         var winSize = cc.director.getWinSize();
         MARGIN = 46;
         var SPACE = 46;
@@ -169,7 +141,7 @@ var PlayLayer = cc.Layer.extend({
         labelSIOClient.setAnchorPoint(cc.p(0,0));
         var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
         itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
-        menuRequest.addChild(itemSIOClient);
+        menuRequest.addChild(itemSIOClient,50);
 
         // Test sending message to default namespace
         var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 38);
@@ -186,7 +158,7 @@ var PlayLayer = cc.Layer.extend({
         menuRequest.addChild(itemTestEvent);
 
 
-        var labelSIOEndpoint = new cc.LabelTTF("start game", "Arial", 38);
+        var labelSIOEndpoint = new cc.LabelTTF("creat game", "Arial", 38);
         labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
         var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
         itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
@@ -222,19 +194,23 @@ var PlayLayer = cc.Layer.extend({
     onMenuSIOClientClicked: function(sender) {
       var _this=this;
       var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});
-
+      var roomID=355033;
+      var playerID='778899';
+      this.roomid=roomID;
+      this.playerid=playerID;
         sioclient.on("connect", function() {
             // var msg = " Connected!";
             // var roominfo={type:'room',roomid:'12345'};
             // sioclient.send(roominfo);
             console.log('Connected!');
-            sioclient.emit('join', _this.openid,_this.roomID);
+            sioclient.emit('join', playerID,roomID);
         });
       this._sioClient = sioclient;
       this.socketinit();
     },
 
-    testAjaxClicked: function(sender) {
+    creatRoomSocket: function(userid,roomid) {
+      console.log(roomid,userid);
       var _this=this;
       var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});      
       sioclient.on("connect", function() {
@@ -242,20 +218,10 @@ var PlayLayer = cc.Layer.extend({
             // var roominfo={type:'room',roomid:'12345'};
             // sioclient.send(roominfo);
             console.log('Connected!');
-            sioclient.emit('join', 9999,35503);
+            sioclient.emit('join', userid,roomid);
         });
       this._sioClient = sioclient;
       this.socketinit();
-      // // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
-      // //   console.log(res);
-      // // });
-      // var time=Date.now();
-      //   var gametype=1;
-      //   var rule='123';
-      //    var openid='12345';
-      // Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
-      //   console.log(res);
-      // });      
     },
 
 
@@ -279,12 +245,20 @@ var PlayLayer = cc.Layer.extend({
         console.log('roominfo',userName,msg);
         //code 2 人齐了可以开始
         if (msg.code==2) {
-          sioclient.emit('gameinfo',_this.roomID,{code:1});
+          sioclient.emit('gameinfo',msg.roomid,{code:1});
         };            
       });
 
       sioclient.on('gameinfo', function (userName, msg) {
-        console.log('gameinfo',userName,msg);        
+        console.log('gameinfo',userName,msg);
+        if (msg.code==3) {
+          for (var i = 0; i < msg.pais.length; i++) {
+            _this.player1list[msg.pais[i]]++;
+          }
+          _this.player1=msg.pais;
+          console.log(_this.player1list);
+          _this.initPlayer();
+        }       
       });
 
       
@@ -298,7 +272,23 @@ var PlayLayer = cc.Layer.extend({
     },    
 
     gamestartClicked: function(sender) {
+      var _this=this;
+       // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+      //   console.log(res);
+      // });
+      var time=Date.now();
+        var gametype=1;
+        var rule='123';
+        var openid='121177';
+        this.playerid=openid;
+        Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
+          console.log(res);
+          if (res.code==1) {
+            _this.roomid=res.data.roomid;
+            _this.creatRoomSocket(openid,res.data.roomid);
+          }
 
+        });      
        
     },
 
@@ -306,28 +296,6 @@ var PlayLayer = cc.Layer.extend({
 
        
     },    
-  //初始化
-  initPai:function(){
-    var _this=this;
-    window.isPlay=false;
-    window.playscene=_this;
-    for (var i = 0,j=0,k=0; i <136 ; i++) {
-      if (k<4) {
-        k++;
-        _this.allpai[i]=_this.paitype[j];
-      }else{
-        k=1;
-        j++;
-        _this.allpai[i]=_this.paitype[j];
-      };
-    };
-   // console.log( _this.allpai.join(','));
-    _this.allpai=_this.Arrayshuffle(_this.allpai);
-
-    //console.log(_this.allpai.join(','));
-    _this.initPlayerPai();
-   
-  },
 
   initPlayerinfo:function(){
     var _this=this;
@@ -425,33 +393,11 @@ var PlayLayer = cc.Layer.extend({
     this.addChild(this.player4nameLabel, 35);
   },
 
-  initPlayerPai:function(){
-    var _this=this;
-    for (var i = 0,j=0; i < 53; i++) { //j 玩家轮流抓牌
-      if (j<4) {
-        j++;
-        _this["player"+j].push(_this.allpai[i]);
-        _this["player"+j+"list"][_this.allpai[i]]++;
-      
-      }else{
-        j=1;
-        _this["player"+j].push(_this.allpai[i]);
-        _this["player"+j+"list"][_this.allpai[i]]++;
-      };
-      _this.painum++;
-    };
-     _this.player1=[9,9,9,10,11,12,13,14,15,16,17,17,17,18];
-    _this.player1list=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,1,1,1,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    this.initPlayer();
-    // this.initPlayer2();
-    // this.initPlayer3();
-    // this.initPlayer4();
-
-  //  var test=[0,0,0,0,0,0,0,0,0,3,1,1,1,1,2,1,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    //console.log(_this.player1list);
-  },
 
   initPlayer:function(){
+    var _this=this;
+    window.isPlay=false;
+    window.playscene=_this;
     var _this=this;
     var p1_posx=60;
     var p2_posy=660;
@@ -464,6 +410,8 @@ var PlayLayer = cc.Layer.extend({
      // 开始延时
     var delay = 0.1;
     var i=0;
+    var ishost=_this.player1list.length==14?true:false;
+    console.log(ishost);
     this.schedule(function() {
       // 这里的 this 指向 component
       if (i==14) {
@@ -482,7 +430,7 @@ var PlayLayer = cc.Layer.extend({
       _this.showPai(i,p1_x);
       i++;
       if (i==15) {
-        _this.sortPai(false,true);
+        _this.sortPai(false,ishost);
         window.isPlay=true;
       };
     }, interval, repeat, delay);
@@ -684,10 +632,10 @@ var PlayLayer = cc.Layer.extend({
       return a - b;
     }
     _this.player1.sort(sortNumber);
-    var delpailength=isout?15:15;
-    console.log(_this.player1pai.length);
+    
+    //console.log(_this.player1pai.length);
 
-    for (var i =delpailength - 2; i >= 0; i--) {
+    for (var i =13; i >= 0; i--) {
       if (typeof  _this.player1pai[i] != "undefined"){
         _this.player1pai[i].removeFromParent();
         _this.player1pai[i] = undefined;
@@ -695,6 +643,7 @@ var PlayLayer = cc.Layer.extend({
       }
      
     };
+    console.log(_this.player1pai);
     var posx=60;
     var pailen=isfirst?14:13;
     for (var i = 0; i < pailen; i++) {
@@ -705,7 +654,7 @@ var PlayLayer = cc.Layer.extend({
       posx+=90;
       _this.showPai(i,x);
     };
-    console.log("-------");
+    //console.log("-------");
    
   },
 
@@ -713,6 +662,7 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var posy=70;
     var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
+
     thing.attr({
         x: posx,
         y:posy,
@@ -731,6 +681,7 @@ var PlayLayer = cc.Layer.extend({
 
   outPai:function(num,paitype){
     // console.log(window.playscene.player1pai.length);
+    console.log(window.playscene.player1pai);
     window.playscene.player1pai[13].removeFromParent();
     window.playscene.player1pai[13] = undefined;
     window.playscene.player1pai.splice(13,1);
@@ -767,7 +718,7 @@ var PlayLayer = cc.Layer.extend({
     thing.setScaleY(64/thing.getContentSize().height);
     _this.addChild(thing,5);
     _this.player1outpai.push(thing);
-    
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype});
   },
 
  
@@ -1101,7 +1052,7 @@ var PlayLayer = cc.Layer.extend({
 
   CanHuPai_3N_recursive:function(arr,count,P) {  
   
-  //  process.stdout.write(arr +'\n'+count+'\n'+P+'\n');  
+    //  process.stdout.write(arr +'\n'+count+'\n'+P+'\n');  
   
     var ret=false;  
     if(count==0)  
@@ -1224,14 +1175,7 @@ var PlayLayer = cc.Layer.extend({
     return ret;  
   },
 
-  //吃牌
-  CheckChiPai : function() {
 
-  },
-  //吃牌 
-  DoChiPai : function() {
-
-  },
   //碰牌
   CheckPengPai : function() {
 
@@ -1249,38 +1193,6 @@ var PlayLayer = cc.Layer.extend({
 
   },
 
-  //对可吃的组合进行输出
-  PrintChiChosePai : function() {
-
-  },
-
-
-
- 
-
-  addCircle : function(circleteam,radius,posx,posy,colors) {
-  },
-
-
-  addThing:function(posx,posy,color,cache){
-    var _cache=cache?true:false;
-    var image=_cache?("tmpsweet"+color+"_png"):("sweet"+color+"_png");
-    var thing = new cc.Sprite(res[image]);
-    var x = posx;
-    var y = posy;
-    
-    thing.attr({
-      x: x,
-      y:y,
-      _color:color,
-      cache:cache
-    });
-    thing.setAnchorPoint(0.5,0.5);
-    thing.setScaleX(this.sweetWidth/thing.getContentSize().width);
-    thing.setScaleY(this.sweetWidth/thing.getContentSize().height);
-    this.addChild(thing,15);
-    this.thingSprites.push(thing);
-  },
 
   update : function() {
     var size = cc.winSize;
