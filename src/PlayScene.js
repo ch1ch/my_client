@@ -27,6 +27,7 @@ var PlayLayer = cc.Layer.extend({
   painum:0,
   roomid:0,
   playerid:0,
+  seat:0,
   ctor:function (stagenum) {
       this._super();
       var _this=this;
@@ -117,6 +118,8 @@ var PlayLayer = cc.Layer.extend({
       _this.initPlayerinfo();
       // _this.initPai();
       _this.initLayer();
+      _this.show_P2outPai(1);
+
   },
 
     onExit: function() {
@@ -171,15 +174,7 @@ var PlayLayer = cc.Layer.extend({
         label5l.setPosition(cc.p(label5.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 5 * SPACE));
         menuRequest.addChild(label5l);       
 
-
         this.sockt_server="ws://127.0.0.1:3010/12345";
-        this.roomID=35503;
-        this.openid=4567897789;
-    },
-
-    testevent: function(data) {
-        var msg = this.tag + " says 'testevent' with data: " + data;
-        console.log(msg);
     },
 
     message: function(data) {
@@ -199,9 +194,6 @@ var PlayLayer = cc.Layer.extend({
       this.roomid=roomID;
       this.playerid=playerID;
         sioclient.on("connect", function() {
-            // var msg = " Connected!";
-            // var roominfo={type:'room',roomid:'12345'};
-            // sioclient.send(roominfo);
             console.log('Connected!');
             sioclient.emit('join', playerID,roomID);
         });
@@ -214,9 +206,6 @@ var PlayLayer = cc.Layer.extend({
       var _this=this;
       var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});      
       sioclient.on("connect", function() {
-            // var msg = " Connected!";
-            // var roominfo={type:'room',roomid:'12345'};
-            // sioclient.send(roominfo);
             console.log('Connected!');
             sioclient.emit('join', userid,roomid);
         });
@@ -224,12 +213,10 @@ var PlayLayer = cc.Layer.extend({
       this.socketinit();
     },
 
-
     socketinit:function(){
       var _this=this;
       var sioclient= _this._sioClient ;
       sioclient.on("message", this.message);
-
 
       sioclient.on("disconnect", this.disconnection);
 
@@ -245,30 +232,53 @@ var PlayLayer = cc.Layer.extend({
         console.log('roominfo',userName,msg);
         //code 2 人齐了可以开始
         if (msg.code==2) {
-          sioclient.emit('gameinfo',msg.roomid,{code:1});
+          console.log("game start");
+          sioclient.emit('gameinfo',msg.roomid,{code:1,player:_this.playerid});
         };            
       });
 
       sioclient.on('gameinfo', function (userName, msg) {
         console.log('gameinfo',userName,msg);
-        if (msg.code==3) {
+        if (msg.code==3) {//code 3游戏开始
           for (var i = 0; i < msg.pais.length; i++) {
             _this.player1list[msg.pais[i]]++;
           }
           _this.player1=msg.pais;
+          _this.seat=msg.seat;
           console.log(_this.player1list);
           _this.initPlayer();
-        }       
+        }else if (msg.code==5){ //code 5 出牌
+          var theseat=msg.seat;
+          var paitype=msg.outpaitype;
+          if (theseat!=_this.seat) {
+            var showseat=(theseat+(4-_this.seat))%4;
+            console.log(showseat);
+            switch(showseat)
+            {
+            case 1:
+              _this.show_P2outPai(paitype);
+              break;
+            case 2:
+              _this.show_P3outPai(paitype);
+              break;
+            case 3:
+              _this.show_P4outPai(paitype);
+              break;
+            }
+            
+          }else{
+          }
+        }  
       });
-
       
     },
 
     onMenuTestMessageClicked: function(sender) {
-
-        if(this._sioClient != null) {
-          this._sioClient.send("Hello Socket.IO!");
-        }
+      var _this=this;
+      _this._sioClient.emit('gameinfo',_this.roomid,{code:6});
+        // if(this._sioClient != null) {
+        //   this._sioClient.send("Hello Socket.IO!");
+        // }
     },    
 
     gamestartClicked: function(sender) {
@@ -405,13 +415,15 @@ var PlayLayer = cc.Layer.extend({
     var p4_posy=690;
     // 以秒为单位的时间间隔
     var interval = 0.1;
-     // 重复次数
-    var repeat = 14;
+    // 重复次数
+    var repeat = _this.player1.length;
      // 开始延时
     var delay = 0.1;
     var i=0;
-    var ishost=_this.player1list.length==14?true:false;
-    console.log(ishost);
+    //console.log(_this.player1.length);
+    var ishost=_this.player1.length==14?true:false;
+    //console.log(ishost);
+
     this.schedule(function() {
       // 这里的 this 指向 component
       if (i==14) {
@@ -429,7 +441,7 @@ var PlayLayer = cc.Layer.extend({
       p1_posx+=90;
       _this.showPai(i,p1_x);
       i++;
-      if (i==15) {
+      if (i==repeat) {
         _this.sortPai(false,ishost);
         window.isPlay=true;
       };
@@ -543,27 +555,10 @@ var PlayLayer = cc.Layer.extend({
       _hu.setScaleX(146/hu.getContentSize().width);
       _hu.setScaleY(90/hu.getContentSize().height);
       this.addChild(_hu, 35,'gang');
-
-      // var hu = new cc.Sprite(res.p_ui_chooseview_hu);
-      // hu.attr({
-      //    x: size.width*0.75,
-      //    y: size.height *0.23,
-      // });
-      // hu.setScaleX(146/hu.getContentSize().width);
-      // hu.setScaleY(90/hu.getContentSize().height);
-      // this.addChild(hu, 25,'hu');
+   
     }
 
     if (isgang) {
-      // var gang = new cc.Sprite(res.p_ui_chooseview_gang);
-      // gang.attr({
-      //    x: size.width*0.66,
-      //    y: size.height *0.22,
-      // });
-      // gang.setScaleX(136/gang.getContentSize().width);
-      // gang.setScaleY(120/gang.getContentSize().height);
-      // this.addChild(gang, 25,'gang');
-
       var gang = new cc.MenuItemImage(
         res.p_ui_chooseview_gang,
         res.p_ui_chooseview_gang,
@@ -603,14 +598,6 @@ var PlayLayer = cc.Layer.extend({
       _peng.setScaleX(136/peng.getContentSize().width);
       _peng.setScaleY(120/peng.getContentSize().height);
       this.addChild(_peng, 35,'gang');
-
-      //   var peng =  new cc.Sprite(res.p_ui_chooseview_peng);
-      //   peng.setAnchorPoint(cc.p(0,0));
-      //   var _peng = new cc.MenuItemLabel(peng, this.doPeng(paitype), this);
-      //   _peng.setPosition( size.width*0.57,size.height *0.23);
-      //   _peng.setScaleX(136/_peng.getContentSize().width);
-      // _peng.setScaleY(120/_peng.getContentSize().height);
-      //  this.addChild(_peng,25,'gang');
     }
 
     return true;
@@ -643,7 +630,7 @@ var PlayLayer = cc.Layer.extend({
       }
      
     };
-    console.log(_this.player1pai);
+   // console.log(_this.player1pai);
     var posx=60;
     var pailen=isfirst?14:13;
     for (var i = 0; i < pailen; i++) {
@@ -718,9 +705,65 @@ var PlayLayer = cc.Layer.extend({
     thing.setScaleY(64/thing.getContentSize().height);
     _this.addChild(thing,5);
     _this.player1outpai.push(thing);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype});
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
   },
 
+  show_P2outPai:function(paitype){
+    console.log(paitype);
+    var _this=this;
+    var outlength=_this.player1outpai.length;
+    var posy=250;
+    var posx=420+outlength*46;
+    var thing = new cc.Sprite(res["p_pai"+paitype]);
+    thing.attr({
+        x: posx,
+        y:posy
+    });
+    thing.setAnchorPoint(0.5,0.5);
+    thing.setScaleX(45/thing.getContentSize().width);
+    thing.setScaleY(64/thing.getContentSize().height);
+    _this.addChild(thing,5);
+    _this.player1outpai.push(thing);
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+  },
+
+  show_P3outPai:function(paitype){
+    console.log(paitype);
+    var _this=this;
+    var outlength=_this.player1outpai.length;
+    var posy=250;
+    var posx=420+outlength*46;
+    var thing = new cc.Sprite(res["p_pai"+paitype]);
+    thing.attr({
+        x: posx,
+        y:posy
+    });
+    thing.setAnchorPoint(0.5,0.5);
+    thing.setScaleX(45/thing.getContentSize().width);
+    thing.setScaleY(64/thing.getContentSize().height);
+    _this.addChild(thing,5);
+    _this.player1outpai.push(thing);
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+  },
+
+  show_P4outPai:function(paitype){
+    console.log(paitype);
+    var _this=this;
+    var outlength=_this.player1outpai.length;
+    var posy=250;
+    var posx=420+outlength*46;
+    var thing = new cc.Sprite(res["p_pai"+paitype]);
+    thing.attr({
+        x: posx,
+        y:posy
+    });
+    thing.setAnchorPoint(0.5,0.5);
+    thing.setScaleX(45/thing.getContentSize().width);
+    thing.setScaleY(64/thing.getContentSize().height);
+    _this.addChild(thing,5);
+    _this.player1outpai.push(thing);
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+  },
  
   CanHuPai__7pair:function (arr){
     var pairCount=0;
