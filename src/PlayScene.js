@@ -118,7 +118,6 @@ var PlayLayer = cc.Layer.extend({
       _this.initPlayerinfo();
       // _this.initPai();
       _this.initLayer();
-      _this.show_P2outPai(1);
 
   },
 
@@ -690,11 +689,10 @@ var PlayLayer = cc.Layer.extend({
   },
 
   show_P1outPai:function(paitype){
-    console.log(paitype);
     var _this=this;
     var outlength=_this.player1outpai.length;
-    var posy=250;
     var posx=420+outlength*46;
+    var posy=250;
     var thing = new cc.Sprite(res["p_pai"+paitype]);
     thing.attr({
         x: posx,
@@ -709,60 +707,60 @@ var PlayLayer = cc.Layer.extend({
   },
 
   show_P2outPai:function(paitype){
-    console.log(paitype);
     var _this=this;
-    var outlength=_this.player1outpai.length;
-    var posy=250;
-    var posx=420+outlength*46;
+    var outlength=_this.player2outpai.length;
+    var line=Math.floor(outlength/7);
+    var posx=300+62*line;
+    var posy=490-(outlength%7)*44;
     var thing = new cc.Sprite(res["p_pai"+paitype]);
     thing.attr({
-        x: posx,
-        y:posy
+      x: posx,
+      y:posy,
+      rotation: 90
     });
     thing.setAnchorPoint(0.5,0.5);
-    thing.setScaleX(45/thing.getContentSize().width);
-    thing.setScaleY(64/thing.getContentSize().height);
+    thing.setScaleX(42/thing.getContentSize().width);
+    thing.setScaleY(60/thing.getContentSize().height);
     _this.addChild(thing,5);
-    _this.player1outpai.push(thing);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+    _this.player2outpai.push(thing);
+   
   },
 
   show_P3outPai:function(paitype){
-    console.log(paitype);
     var _this=this;
-    var outlength=_this.player1outpai.length;
-    var posy=250;
-    var posx=420+outlength*46;
+    var outlength=_this.player3outpai.length;
+    var line=Math.floor(outlength/11);
+    var posx=480+(outlength%11)*41;
+    var posy=590-line*60;
     var thing = new cc.Sprite(res["p_pai"+paitype]);
     thing.attr({
         x: posx,
         y:posy
     });
     thing.setAnchorPoint(0.5,0.5);
-    thing.setScaleX(45/thing.getContentSize().width);
-    thing.setScaleY(64/thing.getContentSize().height);
+    thing.setScaleX(40/thing.getContentSize().width);
+    thing.setScaleY(58/thing.getContentSize().height);
     _this.addChild(thing,5);
-    _this.player1outpai.push(thing);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+    _this.player3outpai.push(thing);
   },
 
   show_P4outPai:function(paitype){
-    console.log(paitype);
     var _this=this;
-    var outlength=_this.player1outpai.length;
-    var posy=250;
-    var posx=420+outlength*46;
+    var outlength=_this.player4outpai.length;
+    var line=Math.floor(outlength/7);
+    var posx=1040-62*line;
+    var posy=220+(outlength%7)*44;
     var thing = new cc.Sprite(res["p_pai"+paitype]);
     thing.attr({
         x: posx,
-        y:posy
+        y:posy,
+        rotation: 270
     });
     thing.setAnchorPoint(0.5,0.5);
-    thing.setScaleX(45/thing.getContentSize().width);
-    thing.setScaleY(64/thing.getContentSize().height);
+    thing.setScaleX(42/thing.getContentSize().width);
+    thing.setScaleY(60/thing.getContentSize().height);
     _this.addChild(thing,5);
-    _this.player1outpai.push(thing);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:4,playerid:this.playerid,paitype:paitype,seat:_this.seat});
+    _this.player4outpai.push(thing);
   },
  
   CanHuPai__7pair:function (arr){
