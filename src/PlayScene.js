@@ -294,11 +294,11 @@ var PlayLayer = cc.Layer.extend({
     },
 
     showCountDown:function(count,backcall){
-       // 以秒为单位的时间间隔
+      // 以秒为单位的时间间隔
       var interval = 1;
       // 重复次数
       var repeat = count;
-       // 开始延时
+      // 开始延时
       var delay = 0.1;
       var i=count;
       this.schedule(function() {
@@ -310,7 +310,6 @@ var PlayLayer = cc.Layer.extend({
         }
         i--;
       }, interval, repeat, delay);
-
      
     },
 
@@ -706,7 +705,7 @@ var PlayLayer = cc.Layer.extend({
     this.removeChild(gang); 
   },
 
-  showP1Peng(paitype,outseat){
+  showP1Peng:function(paitype,outseat){
     var _this=this;
     var showseat=(outseat+(4-_this.seat))%4;
     if (typeof  this.player1pai[13] != "undefined"){
@@ -716,8 +715,6 @@ var PlayLayer = cc.Layer.extend({
       this.player1.splice(13,1);
       this.player1list[paitype]--;
     }
-
-    
 
     var newplayer1=[];
     console.log('player1.length',this.player1.length);
@@ -770,10 +767,9 @@ var PlayLayer = cc.Layer.extend({
         _this.outPai(_this["player1"]-1,paitype);
     })
 
-    
   },
 
-  showP2Peng(paitype,fromseat){
+  showP2Peng:function(paitype,fromseat){
     var _this=this;
 
     for (var i = _this.player2pai.length-1; i >=0; i--) {
@@ -828,7 +824,7 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  showP3Peng(paitype,fromseat){
+  showP3Peng:function(paitype,fromseat){
     var _this=this;
     for (var i = _this.player3pai.length-1; i >=0; i--) {
       _this.player3pai[i].removeFromParent();
@@ -880,7 +876,7 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  showP4Peng(paitype,fromseat){
+  showP4Peng:function(paitype,fromseat){
     var _this=this;
     for (var i = _this.player4pai.length-1; i >=0; i--) {
       _this.player4pai[i].removeFromParent();
@@ -1009,6 +1005,8 @@ var PlayLayer = cc.Layer.extend({
     window.playscene.show_P1outPai(paitype);
     window.playscene.player1list[paitype]--;
     window.playscene.sortPai(true);
+    window.playscene.timeLabel.setString('');
+     window.playscene.unscheduleAllCallbacks();
   },
 
   AddPai:function(paitype){
