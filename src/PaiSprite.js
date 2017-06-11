@@ -36,7 +36,7 @@
                     },target) );
                     if (window.isPlay) {
 	    				target.runAction(seqAc);
-	    				window.isPlay=false;
+	    				// window.isPlay=false;
                     };
 	                target.opacity = 180;
 	                return true;

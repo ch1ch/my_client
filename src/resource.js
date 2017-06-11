@@ -60,9 +60,7 @@ var res = {
     p_ui_chooseview_peng_s:"res/play/ui/peng_s.png",
     p_ui_chooseview_hu_s:"res/play/ui/hu_s.png",
     p_ui_chooseview_gang_s:"res/play/ui/gang_s.png",
-    p_ui_chooseview_peng_m:"res/play/ui/peng_m.png",
-    p_ui_chooseview_hu_m:"res/play/ui/hu_m.png",
-    p_ui_chooseview_gang_m:"res/play/ui/gang_m.png",
+    p_ui_chooseview_guo_s:"res/play/ui/guo_s.png",
 
 
 
