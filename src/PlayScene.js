@@ -36,7 +36,7 @@ var PlayLayer = cc.Layer.extend({
   roomid:0,
   playerid:0,
   seat:0,
-  turncountdown:3,
+  turncountdown:300,
   waitcountdown:2,
   sockt_server:"ws://127.0.0.1:3010",
   ctor:function (stagenum) {
@@ -129,7 +129,6 @@ var PlayLayer = cc.Layer.extend({
      //玩家信息
       _this.initPlayerinfo();
       _this.initLayer();
-      _this.checkChoose();
   },
 
     onExit: function() {
@@ -238,7 +237,7 @@ var PlayLayer = cc.Layer.extend({
           _this.player1=msg.pais;
           _this.seat=msg.seat;
           console.log(_this.player1list);
-          _this.initPlayer();
+          _this.initPlayer(msg.turnseat);
         }else if (msg.code==5){ //code 5 出牌
           var theseat=msg.seat;
           var paitype=msg.outpaitype;
@@ -273,7 +272,24 @@ var PlayLayer = cc.Layer.extend({
         }else if (msg.code==7){
            _this.AddPai(msg.nextpai);
            window.isPlay=true;
-        } 
+        }else if (msg.code==9){
+          var paitype=msg.paitype;
+          var showseat=(msg.seat+(4-_this.seat))%4;
+          var fromseat=(msg.fromseat+(4-_this.seat))%4;
+
+          switch(showseat)
+            {
+            case 1:
+              _this.showP2Peng(paitype,fromseat);
+              break;
+            case 2:
+              _this.showP3Peng(paitype,fromseat);
+              break;
+            case 3:
+              _this.showP4Peng(paitype,fromseat);
+              break;
+          }
+        }
       });
     },
 
@@ -434,7 +450,7 @@ var PlayLayer = cc.Layer.extend({
     this.addChild(this.player4nameLabel, 35);
   },
 
-  initPlayer:function(){
+  initPlayer:function(turnseat){
     var _this=this;
     window.isPlay=false;
     window.playscene=_this;
@@ -473,15 +489,17 @@ var PlayLayer = cc.Layer.extend({
       i++;
       if (i==repeat) {
         _this.sortPai(false,ishost);
-        window.isPlay=true;
-         
-        // _this.showCountDown(_this.turncountdown,function(){
-        //   if (_this["player1"].length>=14) {
-        //     _this.outPai(13,_this.player1[13]);
-        //   }
-        // })
+        if (_this.seat==turnseat) {
+          window.isPlay=true;
+          _this.showCountDown(_this.turncountdown,function(){
+            if (_this["player1"].length>=14) {
+              _this.outPai(13,_this.player1[13]);
+            }
+          })
+        }
       };
     }, interval, repeat, delay);
+
   },
 
   initPlayer2:function(posy){
@@ -489,19 +507,19 @@ var PlayLayer = cc.Layer.extend({
     var posx=230;
     // var posy=660;
     // for (var i = 0; i < 13; i++) {
-      var thing = new cc.Sprite(res.p_ui_rightpai);
-     
-      thing.attr({
-        x: posx,
-        y:posy,
-        anchorX: 0,
-        anchorY: 0.5,
-        rotation: 180
-      });
-      thing.setScaleX(24/thing.getContentSize().width);
-      thing.setScaleY(36/thing.getContentSize().height);
-      _this.addChild(thing,15);
-      _this.player2pai.push(thing);
+    var thing = new cc.Sprite(res.p_ui_rightpai);
+   
+    thing.attr({
+      x: posx,
+      y:posy,
+      anchorX: 0,
+      anchorY: 0.5,
+      rotation: 180
+    });
+    thing.setScaleX(24/thing.getContentSize().width);
+    thing.setScaleY(36/thing.getContentSize().height);
+    _this.addChild(thing,15);
+    _this.player2pai.push(thing);
     // };
   },
 
@@ -569,9 +587,9 @@ var PlayLayer = cc.Layer.extend({
     }
     
     console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
-     ishu=true;
-     isgang=true;
-     ispeng=true;
+     // ishu=true;
+     // isgang=true;
+     // ispeng=true;
     if (ishu || isgang || ispeng) {
     }else{
       return false;
@@ -645,7 +663,7 @@ var PlayLayer = cc.Layer.extend({
       res.p_ui_chooseview_guo_s,
       res.p_ui_chooseview_guo_s,
       function () {
-        _this.doPeng(paitype);
+        _this.doguo();
       }, this);
     guo.attr({
       x: size.width*0.8,
@@ -669,23 +687,37 @@ var PlayLayer = cc.Layer.extend({
     console.log('peng',paitype);
     var peng = this.getChildByName("peng");
     this.removeChild(peng); 
+    var guo = this.getChildByName("guo");
+    this.removeChild(guo); 
     // this.getChildByTag('peng').setVisible(false);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:8,paitype:paitype,seat:_this.seat});
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:8,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
     _this.showP1Peng(paitype,outseat);
   },
 
+  doguo:function(){
+    var peng = this.getChildByName("peng");
+    this.removeChild(peng); 
+    var guo = this.getChildByName("guo");
+    this.removeChild(guo); 
+    var hu = this.getChildByName("hu");
+    this.removeChild(hu); 
+    var gang = this.getChildByName("gang");
+    this.removeChild(gang); 
+  },
+
   showP1Peng(paitype,outseat){
     var _this=this;
-    paitype=0;
-    outseat=1;
     var showseat=(outseat+(4-_this.seat))%4;
+    if (typeof  this.player1pai[13] != "undefined"){
+      this.player1pai[13].removeFromParent();
+      this.player1pai[13] = undefined;
+      this.player1pai.splice(13,1);
+      this.player1.splice(13,1);
+      this.player1list[paitype]--;
+    }
 
-    this.player1pai[13].removeFromParent();
-    this.player1pai[13] = undefined;
-    this.player1pai.splice(13,1);
-    this.player1.splice(13,1);
-    this.player1list[paitype]--;
+    
 
     var newplayer1=[];
     console.log('player1.length',this.player1.length);
@@ -722,8 +754,6 @@ var PlayLayer = cc.Layer.extend({
         var thing = new PaiSprite(res.p_ui_backpai);
         
       }
-      
-
       thing.attr({
           x: posx,
           y:posy
@@ -735,20 +765,173 @@ var PlayLayer = cc.Layer.extend({
       _this.addChild(thing,15);
       _this.player1pengpai.push(thing);
     }
+    window.isPlay=true;
+    _this.showCountDown(_this.turncountdown,function(){
+        _this.outPai(_this["player1"]-1,paitype);
+    })
 
     
   },
 
-  showP2Peng(paitype){
+  showP2Peng(paitype,fromseat){
+    var _this=this;
 
+    for (var i = _this.player2pai.length-1; i >=0; i--) {
+      _this.player2pai[i].removeFromParent();
+      _this.player2pai[i] = null;
+      _this.player2pai.splice(i,1);
+    }
+    var p2_posy=640-(_this.player2peng*128);
+    
+    _this.player2peng++;
+    var posx=230;
+    for (var i = 1; i < 4; i++) {
+      if (i==1&&fromseat==2) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==3) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: posx,
+          y:p2_posy,
+          anchorX: 0,
+          anchorY: 0.5,
+          rotation: 90
+      });
+      p2_posy-=42;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player2pengpai.push(thing);
+    }
+     p2_posy-=4;
+    for (var i = _this.player2pengpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      thing.attr({
+        x: posx,
+        y:p2_posy,
+        anchorX: 0,
+        anchorY: 0.5,
+        rotation: 180
+      });
+       p2_posy-=37;
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player2pai.push(thing);
+    }
   },
 
-  showP3Peng(paitype){
-
+  showP3Peng(paitype,fromseat){
+    var _this=this;
+    for (var i = _this.player3pai.length-1; i >=0; i--) {
+      _this.player3pai[i].removeFromParent();
+      _this.player3pai[i] = null;
+      _this.player3pai.splice(i,1);
+    }
+    var p3_posx=480+(_this.player3peng*128);
+    
+    _this.player3peng++;
+     var posy=670;
+    for (var i = 1; i < 4; i++) {
+      if (i==1&&fromseat==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==3) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: p3_posx,
+          y: posy,
+          anchorX: 0,
+          anchorY: 0.5,
+      });
+      p3_posx+=41;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player3pengpai.push(thing);
+    }
+    p3_posx-=4;
+    for (var i = _this.player3pengpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_backpai);
+      thing.attr({
+        x: p3_posx,
+        y: posy,
+        anchorX: 0,
+        anchorY: 0.5,
+      });
+       p3_posx+=41;
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player3pai.push(thing);
+    }
   },
 
-  showP4Peng(paitype){
-
+  showP4Peng(paitype,fromseat){
+    var _this=this;
+    for (var i = _this.player4pai.length-1; i >=0; i--) {
+      _this.player4pai[i].removeFromParent();
+      _this.player4pai[i] = null;
+      _this.player4pai.splice(i,1);
+    }
+    var p4_posy=670-(_this.player4peng*128);
+    
+    _this.player4peng++;
+    var posx=1090;
+    for (var i = 1; i < 4; i++) {
+      if (i==1&&fromseat==2) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: posx,
+          y:p4_posy,
+          anchorX: 0,
+          anchorY: 0.5,
+          rotation: 90
+      });
+      p4_posy-=42;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player4pengpai.push(thing);
+    }
+     p4_posy-=4;
+    for (var i = _this.player4pengpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      thing.attr({
+        x: posx,
+        y:p4_posy,
+        anchorX: 0,
+        anchorY: 0.5,
+        rotation: 180
+      });
+       p4_posy-=37;
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player4pai.push(thing);
+    }
   },
 
   doGang:function(paitype){
@@ -816,9 +999,12 @@ var PlayLayer = cc.Layer.extend({
   outPai:function(num,paitype){
     window.isPlay=false;
     // console.log('out',num,paitype)
-    window.playscene.player1pai[13].removeFromParent();
-    window.playscene.player1pai[13] = undefined;
-    window.playscene.player1pai.splice(13,1);
+    if (typeof window.playscene.player1pai[13]!= "undefined") {
+      window.playscene.player1pai[13].removeFromParent();
+      window.playscene.player1pai[13] = undefined;
+      window.playscene.player1pai.splice(13,1);
+    }
+    
     window.playscene.player1.splice(num,1);
     window.playscene.show_P1outPai(paitype);
     window.playscene.player1list[paitype]--;
@@ -834,8 +1020,8 @@ var PlayLayer = cc.Layer.extend({
     //console.log(_this.player1list);
     _this.checkChoose(paitype,true);
     _this.showCountDown(_this.turncountdown,function(){
-      if (_this["player1"].length>=14) {
-        _this.outPai(13,paitype);
+      if ((_this["player1"].length+_this.player1peng*3)>=14) {
+        _this.outPai(_this["player1"].length-1,paitype);
       }
     })
   },
@@ -844,7 +1030,7 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var outlength=_this.player1outpai.length;
     var line=Math.floor(outlength/10);
-    var posx=420+(outlength%11)*46;
+    var posx=420+(outlength%10)*46;
     var posy=250-line*65;
     var thing = new cc.Sprite(res["p_pai"+paitype]);
     thing.attr({
@@ -1038,7 +1224,7 @@ var PlayLayer = cc.Layer.extend({
     this.removeChild(gang); 
     var guo = this.getChildByName("guo");
     this.removeChild(guo); 
-    _this.checkChoose();
+    // _this.checkChoose();
   },
  
   CanHuPai__7pair:function (arr){
