@@ -286,6 +286,8 @@ var PlayLayer = cc.Layer.extend({
             _this.removeChild(hu); 
             var gang = _this.getChildByName("gang");
             _this.removeChild(gang); 
+            var hu =  this.getChildByName("hu");
+            this.removeChild(hu); 
           if (nextseat==_this.seat) {
              sioclient.emit('gameinfo',msg.roomid,{code:6,seat:_this.seat,playerid:_this.playerid});
             // _this.AddPai(msg.);
@@ -500,12 +502,12 @@ var PlayLayer = cc.Layer.extend({
     // 重复次数
     var repeat = _this.player1.length-1;
      // 开始延时
-     console.log('rep ',repeat);
+     //console.log('rep ',repeat);
     var delay = 0.1;
     var i=0;
     //console.log(_this.player1.length);
     var ishost=_this.player1.length==14?true:false;
-    console.log('ishost ',ishost);
+    //console.log('ishost ',ishost);
 
     this.schedule(function() {
       // 这里的 this 指向 component
@@ -530,7 +532,8 @@ var PlayLayer = cc.Layer.extend({
         _this.sortPai(false,ishost);
         if (_this.seat==turnseat) {
           window.isPlay=true;
-          console.log('pai length ',window.playscene.player1pai.length);
+          _this.checkChoose(0,true,_this.seat)
+         // console.log('pai length ',window.playscene.player1pai.length);
           _this.showCountDown(_this.turncountdown,function(){
             if (_this["player1"].length>=14) {
               _this.outPai(13,_this.player1[13]);
@@ -538,7 +541,7 @@ var PlayLayer = cc.Layer.extend({
           })
         }else{
 
-          console.log('pai length ',window.playscene.player1pai.length);
+        //  console.log('pai length ',window.playscene.player1pai.length);
         }
       };
     }, interval, repeat, delay);
@@ -621,24 +624,24 @@ var PlayLayer = cc.Layer.extend({
   checkChoose:function(paitype,self,outseat){
     var _this=this;
      var size = cc.winSize;
-    var ishu=_this.CanHuPai(_this.player1list);
-    //console.log(_this.player1list);
+    var ishu=_this.CanHuPai(_this.player1list,paitype);
+    console.log(paitype);
+    console.log(_this.player1list);
     var index = _this.player1penglist.indexOf(paitype);
 
     var isgang=false;
     
     if (self&&_this.player1list[paitype]==4 && (index == -1 )) {
       isgang=true;
-    }else if(_this.player1list[paitype]>=3 && (index == -1 )){
+    }else if( (!self)&&_this.player1list[paitype]>=3 && (index == -1 )){
       isgang=true;
     };
     
-
     var ispeng=false;
     if (!self) {
       ispeng=((index == -1 ) && (_this.player1list[paitype]>=2))?true:false;
-    }    
-    //console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
+    }
+    console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
      // ishu=true;
      // isgang=true;
      // ispeng=true;
@@ -744,6 +747,8 @@ var PlayLayer = cc.Layer.extend({
     this.removeChild(guo); 
     var gang = this.getChildByName("gang");
     this.removeChild(gang); 
+    var hu =  this.getChildByName("hu");
+    this.removeChild(hu); 
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:8,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
@@ -773,10 +778,10 @@ var PlayLayer = cc.Layer.extend({
     }
 
     var newplayer1=[];
-    console.log('player1.length',this.player1.length);
+    //console.log('player1.length',this.player1.length);
     for (var i = 0; i < this.player1.length; i++) {
       if (this.player1[i]==paitype) {
-        console.log('is ',i);
+       // console.log('is ',i);
         this.player1pai[i].removeFromParent();
         this.player1pai[i] = null;
         this.player1list[paitype]--;
@@ -998,6 +1003,8 @@ var PlayLayer = cc.Layer.extend({
     this.removeChild(peng); 
     var guo = this.getChildByName("guo");
     this.removeChild(guo); 
+    var hu =  this.getChildByName("hu");
+    this.removeChild(hu);
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:10,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
@@ -1231,6 +1238,7 @@ var PlayLayer = cc.Layer.extend({
 
   doHu:function(paitype){
     console.log('hu',paitype);
+    this.winGame();
   },
 
   sortPai:function(isout,isfirst){
@@ -1301,7 +1309,16 @@ var PlayLayer = cc.Layer.extend({
       window.playscene.player1pai[num] = undefined;
       window.playscene.player1pai.splice(num,1);
     }
-    
+
+    var peng =  window.playscene.getChildByName("peng");
+     window.playscene.removeChild(peng); 
+    var guo =  window.playscene.getChildByName("guo");
+     window.playscene.removeChild(guo); 
+    var gang =  window.playscene.getChildByName("gang");
+    window.playscene.removeChild(gang); 
+    var hu =  window.playscene.getChildByName("hu");
+    window.playscene.removeChild(hu); 
+
     window.playscene.player1.splice(num,1);
     window.playscene.show_P1outPai(paitype);
     window.playscene.player1list[paitype]--;
@@ -1322,6 +1339,14 @@ var PlayLayer = cc.Layer.extend({
      console.log('pai length ',window.playscene.player1pai.length);
 
     _this.showCountDown(_this.turncountdown,function(){
+       var peng = this.getChildByName("peng");
+      this.removeChild(peng); 
+      var guo = this.getChildByName("guo");
+      this.removeChild(guo); 
+      var gang = this.getChildByName("gang");
+      this.removeChild(gang); 
+      var hu =  this.getChildByName("hu");
+      this.removeChild(hu);
       if ((_this["player1"].length+_this.player1peng*3)>=14) {
         _this.outPai(_this["player1"].length-1,paitype);
       }
@@ -1527,7 +1552,6 @@ var PlayLayer = cc.Layer.extend({
     this.removeChild(gang); 
     var guo = this.getChildByName("guo");
     this.removeChild(guo); 
-    // _this.checkChoose();
   },
  
   CanHuPai__7pair:function (arr){
@@ -1573,7 +1597,12 @@ var PlayLayer = cc.Layer.extend({
    return result;  
   },
 
-  CanHuPai:function (arr){  
+  CanHuPai:function (arr,paitype){ 
+    if (this.player1.length==13) {
+      arr[paitype]++;
+    };
+    console.log('ishu?',paitype);
+    console.log(arr)
     var _this=this;
     if(_this.CanHuPai__7pair(arr)){  
         return true;  
@@ -1582,7 +1611,8 @@ var PlayLayer = cc.Layer.extend({
         return true;  
     }
     else{  
-        return false;  
+      arr[paitype]--;
+      return false;  
     }  
   },
 
@@ -1997,8 +2027,8 @@ var PlayLayer = cc.Layer.extend({
 
     var size = cc.winSize;
     var winbg = new cc.MenuItemImage(
-      res.win_bg,
-      res.win_bg,
+      res.p_ui_chooseview_hu_b,
+      res.p_ui_chooseview_hu_b,
       function () {
         cc.director.runScene( new StageScene());
       }, this);
