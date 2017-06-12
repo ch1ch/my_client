@@ -30,6 +30,7 @@ var PlayLayer = cc.Layer.extend({
   player2pengpai:[],
   player3pengpai:[],
   player4pengpai:[],
+  player1penglist:[],
   isPlay:false,
   allpai:new Array(136),
   painum:0,
@@ -131,227 +132,234 @@ var PlayLayer = cc.Layer.extend({
       _this.initLayer();
   },
 
-    onExit: function() {
-        if(this._sioEndpoint) this._sioEndpoint.disconnect();
-        if(this._sioClient) this._sioClient.disconnect();
+  onExit: function() {
+      if(this._sioEndpoint) this._sioEndpoint.disconnect();
+      if(this._sioClient) this._sioClient.disconnect();
 
-        this._super();
-    },
-   initLayer:function() {
-      var size = cc.winSize;
+      this._super();
+  },
+  initLayer:function() {
+    var size = cc.winSize;
 
-        var menuRequest = new cc.Menu();
-        menuRequest.setPosition(cc.p(0, 0));
-        this.addChild(menuRequest,50);
-        var winSize = cc.director.getWinSize();
-        MARGIN = 46;
-        var SPACE = 46;
-        var vspace = 80;
+      var menuRequest = new cc.Menu();
+      menuRequest.setPosition(cc.p(0, 0));
+      this.addChild(menuRequest,50);
+      var winSize = cc.director.getWinSize();
+      MARGIN = 46;
+      var SPACE = 46;
+      var vspace = 80;
 
-          // Test to create basic client in the default namespace
-        var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 38);
-        labelSIOClient.setAnchorPoint(cc.p(0,0));
-        var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
-        itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
-        menuRequest.addChild(itemSIOClient,50);
+        // Test to create basic client in the default namespace
+      var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 38);
+      labelSIOClient.setAnchorPoint(cc.p(0,0));
+      var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
+      itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
+      menuRequest.addChild(itemSIOClient,50);
 
-        // Test sending message to default namespace
-        var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 38);
-        labelTestMessage.setAnchorPoint(cc.p(0,0));
-        var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
-        itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
-        menuRequest.addChild(itemTestMessage);
+      // Test sending message to default namespace
+      var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 38);
+      labelTestMessage.setAnchorPoint(cc.p(0,0));
+      var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
+      itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
+      menuRequest.addChild(itemTestMessage);
 
-        // Test sending event 'echotest' to default namespace
-        var labelTestEvent = new cc.LabelTTF("new game", "Arial", 38);
-        labelTestEvent.setAnchorPoint(cc.p(0,0));
-        var itemTestEvent = new cc.MenuItemLabel(labelTestEvent, this.newGame, this);
-        itemTestEvent.setPosition(cc.p(labelTestEvent.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 3 * SPACE));
-        menuRequest.addChild(itemTestEvent);
+      // Test sending event 'echotest' to default namespace
+      var labelTestEvent = new cc.LabelTTF("new game", "Arial", 38);
+      labelTestEvent.setAnchorPoint(cc.p(0,0));
+      var itemTestEvent = new cc.MenuItemLabel(labelTestEvent, this.newGame, this);
+      itemTestEvent.setPosition(cc.p(labelTestEvent.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 3 * SPACE));
+      menuRequest.addChild(itemTestEvent);
 
 
-        var labelSIOEndpoint = new cc.LabelTTF("creat game", "Arial", 45);
-        labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
-        var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
-        itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
-        menuRequest.addChild(itemSIOEndpoint);          
+      var labelSIOEndpoint = new cc.LabelTTF("creat game", "Arial", 45);
+      labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
+      var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
+      itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
+      menuRequest.addChild(itemSIOEndpoint);          
 
-       
-    },
-
-    message: function(data) {
-        var msg = this.tag + " received message: " + data;
-        console.log(msg);
-    },
-
-    disconnection: function() {
-        var msg = this.tag + " disconnected!";
-        console.log(msg);
-    },
-    onMenuSIOClientClicked: function(sender) {
-      var _this=this;
-      var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});
-      var roomID=355033;
-      var playerID='778899';
-      this.roomid=roomID;
-      this.playerid=playerID;
-        sioclient.on("connect", function() {
-            console.log('Connected!');
-            sioclient.emit('join', playerID,roomID);
-        });
-      this._sioClient = sioclient;
-      this.socketinit();
-    },
-
-   
-    socketinit:function(){
-      var _this=this;
-      var sioclient= _this._sioClient ;
-      sioclient.on("message", this.message);
-
-      sioclient.on("disconnect", this.disconnection);
-
-      sioclient.on('sys', function (sysMsg, users) {
-        console.log('sys',sysMsg,users);
-      });  
-
-      sioclient.on('msg', function (userName, msg) {
-        console.log('msg',userName,msg);
-      });
-
-      sioclient.on('roominfo', function (userName, msg) {
-        console.log('roominfo',userName,msg);
-        //code 2 人齐了可以开始
-        if (msg.code==2) {
-          console.log("game start");
-          sioclient.emit('gameinfo',msg.roomid,{code:1,player:_this.playerid});
-        };            
-      });
-
-      sioclient.on('gameinfo', function (userName, msg) {
-        console.log('gameinfo',userName,msg);
-        if (msg.code==3) {//code 3游戏开始
-          for (var i = 0; i < msg.pais.length; i++) {
-            _this.player1list[msg.pais[i]]++;
-          }
-          _this.player1=msg.pais;
-          _this.seat=msg.seat;
-          console.log(_this.player1list);
-          _this.initPlayer(msg.turnseat);
-        }else if (msg.code==5){ //code 5 出牌
-          var theseat=msg.seat;
-          var paitype=msg.outpaitype;
-          if (theseat!=_this.seat) {
-            var showseat=(theseat+(4-_this.seat))%4;
-            // console.log(showseat);
-            switch(showseat)
-            {
-            case 1:
-              _this.show_P2outPai(paitype);
-              break;
-            case 2:
-              _this.show_P3outPai(paitype);
-              break;
-            case 3:
-              _this.show_P4outPai(paitype);
-              break;
-            }
-            _this.checkChoose(paitype,false,theseat)
-          }else{
-            // _this.checkChoose(paitype,true)
-          }
-
-          var nextseat=msg.nextseat;
-          // console.log(nextseat);
-          _this.showCountDown(_this.waitcountdown,function(){
-            if (nextseat==_this.seat) {
-               sioclient.emit('gameinfo',msg.roomid,{code:6,seat:_this.seat,playerid:_this.playerid});
-              // _this.AddPai(msg.);
-            }
-          })
-        }else if (msg.code==7){
-           _this.AddPai(msg.nextpai);
-           window.isPlay=true;
-        }else if (msg.code==9){
-          var paitype=msg.paitype;
-          var showseat=(msg.seat+(4-_this.seat))%4;
-          var fromseat=(msg.fromseat+(4-_this.seat))%4;
-
-          switch(showseat)
-            {
-            case 1:
-              _this.showP2Peng(paitype,fromseat);
-              break;
-            case 2:
-              _this.showP3Peng(paitype,fromseat);
-              break;
-            case 3:
-              _this.showP4Peng(paitype,fromseat);
-              break;
-          }
-        }
-      });
-    },
-
-    showCountDown:function(count,backcall){
-      // 以秒为单位的时间间隔
-      var interval = 1;
-      // 重复次数
-      var repeat = count;
-      // 开始延时
-      var delay = 0.1;
-      var i=count;
-      this.schedule(function() {
-        this.timeLabel.setString(i);
-       
-        if (i<=0) {
-          this.timeLabel.setString('');
-          backcall();
-        }
-        i--;
-      }, interval, repeat, delay);
      
-    },
+  },
 
-    onMenuTestMessageClicked: function(sender) {
-      var _this=this;
-      _this._sioClient.emit('gameinfo',_this.roomid,{code:6});
-    },    
+  message: function(data) {
+      var msg = this.tag + " received message: " + data;
+      console.log(msg);
+  },
 
-    gamestartClicked: function(sender) {
-      var _this=this;
-       // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
-      //   console.log(res);
-      // });
-      var time=Date.now();
-        var gametype=1;
-        var rule='123';
-        var playernum=4;
-        var openid='121177';
-        this.playerid=openid;
-        Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
-          console.log(res);
-          if (res.code==1) {
-            _this.roomid=res.data.roomid;
-            _this.creatRoomSocket(openid,res.data.roomid,gametype,rule,playernum);
-          }
-        });      
-    },
-
-    creatRoomSocket: function(userid,roomid,gametype,rule,playernum) {
-      console.log(roomid,userid);
-      var _this=this;
-      var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});      
+  disconnection: function() {
+      var msg = this.tag + " disconnected!";
+      console.log(msg);
+  },
+  onMenuSIOClientClicked: function(sender) {
+    var _this=this;
+    var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});
+    var roomID=355033;
+    var playerID='778899';
+    this.roomid=roomID;
+    this.playerid=playerID;
       sioclient.on("connect", function() {
-            console.log('Connected!');
-            sioclient.emit('roominfo',_this.roomid,{code:2,gametype:gametype,rule:rule,playernum:playernum,userid:userid});
-            sioclient.emit('join', userid,roomid);
-        });
-      this._sioClient = sioclient;
-      this.socketinit();
-    },
+          console.log('Connected!');
+          sioclient.emit('join', playerID,roomID);
+      });
+    this._sioClient = sioclient;
+    this.socketinit();
+  },
 
+ 
+  socketinit:function(){
+    var _this=this;
+    var sioclient= _this._sioClient ;
+    sioclient.on("message", this.message);
 
+    sioclient.on("disconnect", this.disconnection);
+
+    sioclient.on('sys', function (sysMsg, users) {
+      console.log('sys',sysMsg,users);
+    });  
+
+    sioclient.on('msg', function (userName, msg) {
+      console.log('msg',userName,msg);
+    });
+
+    sioclient.on('roominfo', function (userName, msg) {
+      console.log('roominfo',userName,msg);
+      //code 2 人齐了可以开始
+      if (msg.code==2) {
+        console.log("game start");
+        sioclient.emit('gameinfo',msg.roomid,{code:1,player:_this.playerid});
+      };            
+    });
+
+    sioclient.on('gameinfo', function (userName, msg) {
+      //console.log('gameinfo',userName,msg);
+      if (msg.code==3) {//code 3游戏开始
+        for (var i = 0; i < msg.pais.length; i++) {
+          _this.player1list[msg.pais[i]]++;
+        }
+        _this.player1=msg.pais;
+        _this.seat=msg.seat;
+        console.log(_this.player1list);
+        _this.initPlayer(msg.turnseat);
+      }else if (msg.code==5){ //code 5 出牌
+        var theseat=msg.seat;
+        var paitype=msg.outpaitype;
+        if (theseat!=_this.seat) {
+          var showseat=(theseat+(4-_this.seat))%4;
+          // console.log(showseat);
+          switch(showseat)
+          {
+          case 1:
+            _this.show_P2outPai(paitype);
+            break;
+          case 2:
+            _this.show_P3outPai(paitype);
+            break;
+          case 3:
+            _this.show_P4outPai(paitype);
+            break;
+          }
+          _this.checkChoose(paitype,false,theseat)
+        }else{
+          // _this.checkChoose(paitype,true)
+        }
+
+        var nextseat=msg.nextseat;
+        // console.log(nextseat);
+        _this.showCountDown(_this.waitcountdown,function(){
+
+            var peng = _this.getChildByName("peng");
+            _this.removeChild(peng); 
+            var guo = _this.getChildByName("guo");
+            _this.removeChild(guo); 
+            var hu = _this.getChildByName("hu");
+            _this.removeChild(hu); 
+            var gang = _this.getChildByName("gang");
+            _this.removeChild(gang); 
+          if (nextseat==_this.seat) {
+             sioclient.emit('gameinfo',msg.roomid,{code:6,seat:_this.seat,playerid:_this.playerid});
+            // _this.AddPai(msg.);
+          }
+        })
+      }else if (msg.code==7){
+         _this.AddPai(msg.nextpai);
+         window.isPlay=true;
+      }else if (msg.code==9){
+        var paitype=msg.paitype;
+        var showseat=(msg.seat+(4-_this.seat))%4;
+        var fromseat=(msg.fromseat+(4-_this.seat))%4;
+
+        switch(showseat)
+          {
+          case 1:
+            _this.showP2Peng(paitype,fromseat);
+            break;
+          case 2:
+            _this.showP3Peng(paitype,fromseat);
+            break;
+          case 3:
+            _this.showP4Peng(paitype,fromseat);
+            break;
+        }
+      }
+    });
+  },
+
+  showCountDown:function(count,backcall){
+    // 以秒为单位的时间间隔
+    var interval = 1;
+    // 重复次数
+    var repeat = count;
+    // 开始延时
+    var delay = 0.1;
+    var i=count;
+    this.schedule(function() {
+      this.timeLabel.setString(i);
+     
+      if (i<=0) {
+        this.timeLabel.setString('');
+        backcall();
+      }
+      i--;
+    }, interval, repeat, delay);
+   
+  },
+
+  onMenuTestMessageClicked: function(sender) {
+    var _this=this;
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:6});
+  },    
+
+  gamestartClicked: function(sender) {
+    var _this=this;
+     // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
+    //   console.log(res);
+    // });
+    var time=Date.now();
+      var gametype=1;
+      var rule='123';
+      var playernum=4;
+      var openid='121177';
+      this.playerid=openid;
+      Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
+        console.log(res);
+        if (res.code==1) {
+          _this.roomid=res.data.roomid;
+          _this.creatRoomSocket(openid,res.data.roomid,gametype,rule,playernum);
+        }
+      });      
+  },
+
+  creatRoomSocket: function(userid,roomid,gametype,rule,playernum) {
+    console.log(roomid,userid);
+    var _this=this;
+    var sioclient = SocketIO.connect("ws://127.0.0.1:3010", {"force new connection" : true});      
+    sioclient.on("connect", function() {
+          console.log('Connected!');
+          sioclient.emit('roominfo',_this.roomid,{code:2,gametype:gametype,rule:rule,playernum:playernum,userid:userid});
+          sioclient.emit('join', userid,roomid);
+      });
+    this._sioClient = sioclient;
+    this.socketinit();
+  },
 
   initPlayerinfo:function(){
     var _this=this;
@@ -461,27 +469,30 @@ var PlayLayer = cc.Layer.extend({
     // 以秒为单位的时间间隔
     var interval = 0.1;
     // 重复次数
-    var repeat = _this.player1.length;
+    var repeat = _this.player1.length-1;
      // 开始延时
+     console.log('rep ',repeat);
     var delay = 0.1;
     var i=0;
     //console.log(_this.player1.length);
     var ishost=_this.player1.length==14?true:false;
-    //console.log(ishost);
+    console.log('ishost ',ishost);
 
     this.schedule(function() {
       // 这里的 this 指向 component
-      if (i==14) {
+      if (i==repeat-1) {
         p1_posx+=20;
-      }else if (i!=13){
-        p2_posy-=37;
-        _this.initPlayer2(p2_posy);
-        p3_posx+=41;
-        _this.initPlayer3(p3_posx);
-        p4_posy-=37;
-        _this.initPlayer4(p4_posy);
-
+      }else if (i!=repeat-1){
+        
       };
+
+      p2_posy-=37;
+      _this.initPlayer2(p2_posy);
+      p3_posx+=41;
+      _this.initPlayer3(p3_posx);
+      p4_posy-=37;
+      _this.initPlayer4(p4_posy);
+
       var p1_x = p1_posx;
       p1_posx+=90;
       _this.showPai(i,p1_x);
@@ -490,14 +501,19 @@ var PlayLayer = cc.Layer.extend({
         _this.sortPai(false,ishost);
         if (_this.seat==turnseat) {
           window.isPlay=true;
+          console.log('pai length ',window.playscene.player1pai.length);
           _this.showCountDown(_this.turncountdown,function(){
             if (_this["player1"].length>=14) {
               _this.outPai(13,_this.player1[13]);
             }
           })
+        }else{
+
+          console.log('pai length ',window.playscene.player1pai.length);
         }
       };
     }, interval, repeat, delay);
+
 
   },
 
@@ -580,12 +596,14 @@ var PlayLayer = cc.Layer.extend({
     //console.log(_this.player1list);
     var isgang=_this.player1list[paitype]>3?true:false;
     if (!self) {
-      var ispeng=_this.player1list[paitype]>=2?true:false;
+      var index = _this.player1penglist.indexOf(paitype);
+      var pengme=((index == -1 ) && (_this.player1list[paitype]>=2));
+      var ispeng=((index == -1 ) && (_this.player1list[paitype]>=2))?true:false;
     }else{
       var ispeng=false;
     }
     
-    console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
+    //console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
      // ishu=true;
      // isgang=true;
      // ispeng=true;
@@ -729,7 +747,7 @@ var PlayLayer = cc.Layer.extend({
         newplayer1.push(this.player1[i]);
       }
     }
-    console.log('player1.length',newplayer1);
+    console.log('player1.length',newplayer1.length);
 
     for (var i = _this.player1pai.length-1; i >=0; i--) {
       if (_this.player1pai[i] ==null) {
@@ -739,6 +757,7 @@ var PlayLayer = cc.Layer.extend({
     _this.player1=newplayer1;
     var posx=60+_this.player1peng*270;
     _this.player1peng++;
+    _this.player1penglist.push(paitype);
     this.sortPai(true);
     //player1peng
     //player1pengpai
@@ -752,8 +771,8 @@ var PlayLayer = cc.Layer.extend({
         
       }
       thing.attr({
-          x: posx,
-          y:posy
+        x: posx,
+        y:posy,
       });
       posx+=86;
       thing.setAnchorPoint(0.5,0.5);
@@ -763,6 +782,7 @@ var PlayLayer = cc.Layer.extend({
       _this.player1pengpai.push(thing);
     }
     window.isPlay=true;
+    console.log(_this["player1"]);
     _this.showCountDown(_this.turncountdown,function(){
         _this.outPai(_this["player1"]-1,paitype);
     })
@@ -933,6 +953,7 @@ var PlayLayer = cc.Layer.extend({
   doGang:function(paitype){
     console.log('gang',paitype);
   },
+
   doHu:function(paitype){
     console.log('hu',paitype);
   },
@@ -943,7 +964,7 @@ var PlayLayer = cc.Layer.extend({
       return a - b;
     }
     _this.player1.sort(sortNumber);
-    
+    console.log('sort--');
     //console.log('ll ',_this.player1.length);
     //console.log( _this.player1pai.length);
 
@@ -958,21 +979,24 @@ var PlayLayer = cc.Layer.extend({
     };
    // console.log(_this.player1pai);
     var posx=60+_this.player1peng*270;
-    var pailen=isfirst?14:_this.player1.length;
-    for (var i = 0; i < pailen; i++) {
-      if (i==_this.player1.length) {
-       posx+=20;
+    var pailen=isfirst?14:(_this.player1.length);
+    //console.log('pailen',pailen,_this.player1.length);
+    for (var i = 0; i < (pailen); i++) {
+      if ((i==_this.player1.length-1) &&isfirst) {
+       //posx+=20;
       };
       var x = posx;
       posx+=90;
       _this.showPai(i,x);
     };
-    //console.log("-------");
-   
   },
 
   showPai:function(i,posx){
     var _this=this;
+    //console.log('show',i,posx,_this.player1[i]);
+    if (_this.player1pai.length>=_this.player1.length) {
+      return false;
+    };
     var posy=70;
     var thing = new PaiSprite(res["p_pai"+_this.player1[i]]);
 
@@ -988,17 +1012,19 @@ var PlayLayer = cc.Layer.extend({
     thing.setScaleY(120/thing.getContentSize().height);
     _this.addChild(thing,15);
     _this.player1pai.push(thing);
-    //console.log(_this.player1pai.length);
+    console.log('show length ',_this.player1pai.length);
 
   },
 
   outPai:function(num,paitype){
     window.isPlay=false;
-    // console.log('out',num,paitype)
-    if (typeof window.playscene.player1pai[13]!= "undefined") {
-      window.playscene.player1pai[13].removeFromParent();
-      window.playscene.player1pai[13] = undefined;
-      window.playscene.player1pai.splice(13,1);
+     console.log('out',num,paitype);
+     console.log(window.playscene.player1pai);
+     console.log(window.playscene.player1pai.length);
+    if (typeof window.playscene.player1pai[num]!= "undefined") {
+      window.playscene.player1pai[num].removeFromParent();
+      window.playscene.player1pai[num] = undefined;
+      window.playscene.player1pai.splice(num,1);
     }
     
     window.playscene.player1.splice(num,1);
@@ -1011,17 +1037,21 @@ var PlayLayer = cc.Layer.extend({
 
   AddPai:function(paitype){
     var _this=this;
+    console.log('add',paitype)
     _this["player1"].push(paitype);
-     _this.showPai(13,1260);
+     _this.showPai((_this["player1"].length-1),1260);
      window.isPlay=true;
     _this.player1list[paitype]++;
     //console.log(_this.player1list);
     _this.checkChoose(paitype,true);
+     console.log('pai length ',window.playscene.player1pai.length);
+
     _this.showCountDown(_this.turncountdown,function(){
       if ((_this["player1"].length+_this.player1peng*3)>=14) {
         _this.outPai(_this["player1"].length-1,paitype);
       }
     })
+
   },
 
   show_P1outPai:function(paitype){
@@ -1709,8 +1739,6 @@ var PlayLayer = cc.Layer.extend({
   },
 });
 
-   
-
 var PlayScene = cc.Scene.extend(
 {
    ctor:function (data) 
@@ -1726,4 +1754,3 @@ var PlayScene = cc.Scene.extend(
     }
 
 });
-
