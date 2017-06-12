@@ -31,6 +31,18 @@ var PlayLayer = cc.Layer.extend({
   player3pengpai:[],
   player4pengpai:[],
   player1penglist:[],
+
+  player1gang:0,
+  player2gang:0,
+  player3gang:0,
+  player4gang:0,
+  player1gangpai:[],
+  player2gangpai:[],
+  player3gangpai:[],
+  player4gangpai:[],
+  player1ganglist:[],
+
+  
   isPlay:false,
   allpai:new Array(136),
   painum:0,
@@ -279,10 +291,10 @@ var PlayLayer = cc.Layer.extend({
             // _this.AddPai(msg.);
           }
         })
-      }else if (msg.code==7){
+      }else if (msg.code==7){ //别人抓牌
          _this.AddPai(msg.nextpai);
          window.isPlay=true;
-      }else if (msg.code==9){
+      }else if (msg.code==9){ //别人碰牌
         var paitype=msg.paitype;
         var showseat=(msg.seat+(4-_this.seat))%4;
         var fromseat=(msg.fromseat+(4-_this.seat))%4;
@@ -297,6 +309,23 @@ var PlayLayer = cc.Layer.extend({
             break;
           case 3:
             _this.showP4Peng(paitype,fromseat);
+            break;
+        }
+      }else if (msg.code==11){ //别人gang牌
+        var paitype=msg.paitype;
+        var showseat=(msg.seat+(4-_this.seat))%4;
+        var fromseat=(msg.fromseat+(4-_this.seat))%4;
+
+        switch(showseat)
+          {
+          case 1:
+            _this.showP2Gang(paitype,fromseat);
+            break;
+          case 2:
+            _this.showP3Gang(paitype,fromseat);
+            break;
+          case 3:
+            _this.showP4Gang(paitype,fromseat);
             break;
         }
       }
@@ -594,15 +623,21 @@ var PlayLayer = cc.Layer.extend({
      var size = cc.winSize;
     var ishu=_this.CanHuPai(_this.player1list);
     //console.log(_this.player1list);
-    var isgang=_this.player1list[paitype]>3?true:false;
-    if (!self) {
-      var index = _this.player1penglist.indexOf(paitype);
-      var pengme=((index == -1 ) && (_this.player1list[paitype]>=2));
-      var ispeng=((index == -1 ) && (_this.player1list[paitype]>=2))?true:false;
-    }else{
-      var ispeng=false;
-    }
+    var index = _this.player1penglist.indexOf(paitype);
+
+    var isgang=false;
     
+    if (self&&_this.player1list[paitype]==4 && (index == -1 )) {
+      isgang=true;
+    }else if(_this.player1list[paitype]>=3 && (index == -1 )){
+      isgang=true;
+    };
+    
+
+    var ispeng=false;
+    if (!self) {
+      ispeng=((index == -1 ) && (_this.player1list[paitype]>=2))?true:false;
+    }    
     //console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
      // ishu=true;
      // isgang=true;
@@ -702,10 +737,13 @@ var PlayLayer = cc.Layer.extend({
   doPeng:function(paitype,outseat){
     var _this=this;
     console.log('peng',paitype);
+    _this.unscheduleAllCallbacks();
     var peng = this.getChildByName("peng");
     this.removeChild(peng); 
     var guo = this.getChildByName("guo");
     this.removeChild(guo); 
+    var gang = this.getChildByName("gang");
+    this.removeChild(gang); 
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:8,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
@@ -755,7 +793,7 @@ var PlayLayer = cc.Layer.extend({
       }
     }
     _this.player1=newplayer1;
-    var posx=60+_this.player1peng*270;
+    var posx=60+_this.player1peng*270+_this.player1gang*360;
     _this.player1peng++;
     _this.player1penglist.push(paitype);
     this.sortPai(true);
@@ -797,7 +835,7 @@ var PlayLayer = cc.Layer.extend({
       _this.player2pai[i] = null;
       _this.player2pai.splice(i,1);
     }
-    var p2_posy=640-(_this.player2peng*128);
+    var p2_posy=640-(_this.player2peng*128+_this.player2gang*168);
     
     _this.player2peng++;
     var posx=230;
@@ -851,7 +889,7 @@ var PlayLayer = cc.Layer.extend({
       _this.player3pai[i] = null;
       _this.player3pai.splice(i,1);
     }
-    var p3_posx=480+(_this.player3peng*128);
+    var p3_posx=480+(_this.player3peng*128+_this.player3gang*168);
     
     _this.player3peng++;
      var posy=670;
@@ -903,7 +941,7 @@ var PlayLayer = cc.Layer.extend({
       _this.player4pai[i] = null;
       _this.player4pai.splice(i,1);
     }
-    var p4_posy=670-(_this.player4peng*128);
+    var p4_posy=670-(_this.player4peng*128+_this.player4gang*168);
     
     _this.player4peng++;
     var posx=1090;
@@ -950,8 +988,245 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  doGang:function(paitype){
+  doGang:function(paitype,outseat){
     console.log('gang',paitype);
+    var _this=this;
+    _this.unscheduleAllCallbacks();
+    var gang = this.getChildByName("gang");
+    this.removeChild(gang); 
+    var peng = this.getChildByName("peng");
+    this.removeChild(peng); 
+    var guo = this.getChildByName("guo");
+    this.removeChild(guo); 
+    // this.getChildByTag('peng').setVisible(false);
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:10,paitype:paitype,seat:_this.seat,fromseat:outseat});
+
+    _this.showP1Gang(paitype,outseat);
+  },
+
+  showP1Gang:function(paitype,outseat){
+    var _this=this;
+    var showseat=(outseat+(4-_this.seat))%4;
+    if (typeof  this.player1pai[13] != "undefined"){
+      this.player1pai[13].removeFromParent();
+      this.player1pai[13] = undefined;
+      this.player1pai.splice(13,1);
+      this.player1.splice(13,1);
+      this.player1list[paitype]--;
+    }
+
+    var newplayer1=[];
+    console.log('player1.length',this.player1.length);
+    for (var i = 0; i < this.player1.length; i++) {
+      if (this.player1[i]==paitype) {
+        console.log('is ',i);
+        this.player1pai[i].removeFromParent();
+        this.player1pai[i] = null;
+        this.player1list[paitype]--;
+
+      }else{
+        newplayer1.push(this.player1[i]);
+      }
+    }
+    console.log('player1.length',newplayer1.length);
+
+    for (var i = _this.player1pai.length-1; i >=0; i--) {
+      if (_this.player1pai[i] ==null) {
+        _this.player1pai.splice(i,1);
+      }
+    }
+    _this.player1=newplayer1;
+    var posx=60+_this.player1gang*360;
+    _this.player1gang++;
+    _this.player1penglist.push(paitype);
+    this.sortPai(true);
+    var posy=70;
+    
+    for (var i = 1; i < 5; i++) {
+      if (i==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+        
+      }
+      thing.attr({
+        x: posx,
+        y:posy,
+      });
+      posx+=86;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(85/thing.getContentSize().width);
+      thing.setScaleY(120/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player1gangpai.push(thing);
+    }
+    window.isPlay=true;
+    console.log(_this["player1"]);
+    _this.showCountDown(_this.turncountdown,function(){
+        _this.outPai(_this["player1"]-1,paitype);
+    })
+
+  },
+
+  showP2Gang:function(paitype,fromseat){
+    var _this=this;
+
+    for (var i = _this.player2pai.length-1; i >=0; i--) {
+      _this.player2pai[i].removeFromParent();
+      _this.player2pai[i] = null;
+      _this.player2pai.splice(i,1);
+    }
+    var p2_posy=640-(_this.player2gang*168);
+    
+    _this.player2gang++;
+    var posx=230;
+    for (var i = 1; i < 5; i++) {
+      if (i==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==3) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: posx,
+          y:p2_posy,
+          anchorX: 0,
+          anchorY: 0.5,
+          rotation: 90
+      });
+      p2_posy-=42;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player2gangpai.push(thing);
+    }
+     p2_posy-=4;
+    for (var i = _this.player2gangpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      thing.attr({
+        x: posx,
+        y:p2_posy,
+        anchorX: 0,
+        anchorY: 0.5,
+        rotation: 180
+      });
+       p2_posy-=37;
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player2pai.push(thing);
+    }
+  },
+
+  showP3Gang:function(paitype,fromseat){
+    var _this=this;
+    for (var i = _this.player3pai.length-1; i >=0; i--) {
+      _this.player3pai[i].removeFromParent();
+      _this.player3pai[i] = null;
+      _this.player3pai.splice(i,1);
+    }
+    var p3_posx=480+(_this.player3gang*168);
+    
+    _this.player3gang++;
+     var posy=670;
+    for (var i = 1; i < 5; i++) {
+      if (i==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==3) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: p3_posx,
+          y: posy,
+          anchorX: 0,
+          anchorY: 0.5,
+      });
+      p3_posx+=41;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player3gangpai.push(thing);
+    }
+    p3_posx-=4;
+    for (var i = _this.player3gangpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_backpai);
+      thing.attr({
+        x: p3_posx,
+        y: posy,
+        anchorX: 0,
+        anchorY: 0.5,
+      });
+       p3_posx+=41;
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player3pai.push(thing);
+    }
+  },
+
+  showP4Gang:function(paitype,fromseat){
+    var _this=this;
+    for (var i = _this.player4pai.length-1; i >=0; i--) {
+      _this.player4pai[i].removeFromParent();
+      _this.player4pai[i] = null;
+      _this.player4pai.splice(i,1);
+    }
+    var p4_posy=670-(_this.player4gang*168);
+    
+    _this.player4gang++;
+    var posx=1090;
+    for (var i = 1; i < 4; i++) {
+      if (i==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==2&&fromseat==1) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }else if (i==3&&fromseat==0) {
+        var thing = new PaiSprite(res["p_pai"+paitype]);
+      }
+      else{
+        var thing = new PaiSprite(res.p_ui_backpai);
+      }
+      thing.attr({
+          x: posx,
+          y:p4_posy,
+          anchorX: 0,
+          anchorY: 0.5,
+          rotation: 90
+      });
+      p4_posy-=42;
+      thing.setAnchorPoint(0.5,0.5);
+      thing.setScaleX(40/thing.getContentSize().width);
+      thing.setScaleY(54/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player4gangpai.push(thing);
+    }
+     p4_posy-=4;
+    for (var i = _this.player4gangpai.length; i < 13; i++) {
+      var thing = new cc.Sprite(res.p_ui_rightpai);
+      thing.attr({
+        x: posx,
+        y:p4_posy,
+        anchorX: 0,
+        anchorY: 0.5,
+        rotation: 180
+      });
+       p4_posy-=37;
+      thing.setScaleX(24/thing.getContentSize().width);
+      thing.setScaleY(36/thing.getContentSize().height);
+      _this.addChild(thing,15);
+      _this.player4pai.push(thing);
+    }
   },
 
   doHu:function(paitype){
@@ -978,7 +1253,7 @@ var PlayLayer = cc.Layer.extend({
      
     };
    // console.log(_this.player1pai);
-    var posx=60+_this.player1peng*270;
+    var posx=60+_this.player1peng*270+_this.player1gang*360;
     var pailen=isfirst?14:(_this.player1.length);
     //console.log('pailen',pailen,_this.player1.length);
     for (var i = 0; i < (pailen); i++) {
@@ -1012,7 +1287,7 @@ var PlayLayer = cc.Layer.extend({
     thing.setScaleY(120/thing.getContentSize().height);
     _this.addChild(thing,15);
     _this.player1pai.push(thing);
-    console.log('show length ',_this.player1pai.length);
+    //console.log('show length ',_this.player1pai.length);
 
   },
 
