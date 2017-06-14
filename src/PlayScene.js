@@ -278,16 +278,7 @@ var PlayLayer = cc.Layer.extend({
         // console.log(nextseat);
         _this.showCountDown(_this.waitcountdown,function(){
 
-            var peng = _this.getChildByName("peng");
-            _this.removeChild(peng); 
-            var guo = _this.getChildByName("guo");
-            _this.removeChild(guo); 
-            var hu = _this.getChildByName("hu");
-            _this.removeChild(hu); 
-            var gang = _this.getChildByName("gang");
-            _this.removeChild(gang); 
-            var hu =  this.getChildByName("hu");
-            this.removeChild(hu); 
+            this.hideChoose();
           if (nextseat==_this.seat) {
              sioclient.emit('gameinfo',msg.roomid,{code:6,seat:_this.seat,playerid:_this.playerid});
             // _this.AddPai(msg.);
@@ -736,18 +727,22 @@ var PlayLayer = cc.Layer.extend({
     return true;
      
   },
-
-  doPeng:function(paitype,outseat){
-    var _this=this;
-    console.log('peng',paitype);
-    _this.unscheduleAllCallbacks();
+  hideChoose:function(){
+    this.unscheduleAllCallbacks();
+    var gang = this.getChildByName("gang");
+    this.removeChild(gang); 
     var peng = this.getChildByName("peng");
     this.removeChild(peng); 
     var guo = this.getChildByName("guo");
     this.removeChild(guo); 
-    var gang = this.getChildByName("gang");
-    this.removeChild(gang); 
     var hu =  this.getChildByName("hu");
+    this.removeChild(hu);
+  },
+
+  doPeng:function(paitype,outseat){
+    var _this=this;
+    console.log('peng',paitype);
+    this.hideChoose();
     this.removeChild(hu); 
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:8,paitype:paitype,seat:_this.seat,fromseat:outseat});
@@ -756,14 +751,7 @@ var PlayLayer = cc.Layer.extend({
   },
 
   doguo:function(){
-    var peng = this.getChildByName("peng");
-    this.removeChild(peng); 
-    var guo = this.getChildByName("guo");
-    this.removeChild(guo); 
-    var hu = this.getChildByName("hu");
-    this.removeChild(hu); 
-    var gang = this.getChildByName("gang");
-    this.removeChild(gang); 
+    this.hideChoose();
   },
 
   showP1Peng:function(paitype,outseat){
@@ -996,15 +984,7 @@ var PlayLayer = cc.Layer.extend({
   doGang:function(paitype,outseat){
     console.log('gang',paitype);
     var _this=this;
-    _this.unscheduleAllCallbacks();
-    var gang = this.getChildByName("gang");
-    this.removeChild(gang); 
-    var peng = this.getChildByName("peng");
-    this.removeChild(peng); 
-    var guo = this.getChildByName("guo");
-    this.removeChild(guo); 
-    var hu =  this.getChildByName("hu");
-    this.removeChild(hu);
+    this.hideChoose();
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:10,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
@@ -1239,6 +1219,7 @@ var PlayLayer = cc.Layer.extend({
   doHu:function(paitype){
     console.log('hu',paitype);
     this.winGame();
+    _this.unscheduleAllCallbacks();
   },
 
   sortPai:function(isout,isfirst){
@@ -1339,14 +1320,7 @@ var PlayLayer = cc.Layer.extend({
      console.log('pai length ',window.playscene.player1pai.length);
 
     _this.showCountDown(_this.turncountdown,function(){
-       var peng = this.getChildByName("peng");
-      this.removeChild(peng); 
-      var guo = this.getChildByName("guo");
-      this.removeChild(guo); 
-      var gang = this.getChildByName("gang");
-      this.removeChild(gang); 
-      var hu =  this.getChildByName("hu");
-      this.removeChild(hu);
+       this.hideChoose();
       if ((_this["player1"].length+_this.player1peng*3)>=14) {
         _this.outPai(_this["player1"].length-1,paitype);
       }
@@ -1544,14 +1518,7 @@ var PlayLayer = cc.Layer.extend({
     _this.player3pengpai=[];
     _this.player4pengpai=[];
 
-    var peng = this.getChildByName("peng");
-    this.removeChild(peng); 
-    var hu = this.getChildByName("hu");
-    this.removeChild(hu); 
-    var gang = this.getChildByName("gang");
-    this.removeChild(gang); 
-    var guo = this.getChildByName("guo");
-    this.removeChild(guo); 
+    this.hideChoose();
   },
  
   CanHuPai__7pair:function (arr){
