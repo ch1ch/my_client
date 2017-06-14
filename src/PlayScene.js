@@ -321,6 +321,23 @@ var PlayLayer = cc.Layer.extend({
             _this.showP4Gang(paitype,fromseat);
             break;
         }
+      }else if (msg.code==13){ //别人胡牌
+        var paitype=msg.paitype;
+        var showseat=(msg.seat+(4-_this.seat))%4;
+        var fromseat=(msg.fromseat+(4-_this.seat))%4;
+
+        switch(showseat)
+          {
+          case 1:
+            _this.showP2Gang(paitype,fromseat);
+            break;
+          case 2:
+            _this.showP3Gang(paitype,fromseat);
+            break;
+          case 3:
+            _this.showP4Gang(paitype,fromseat);
+            break;
+        }
       }
     });
   },
@@ -616,8 +633,6 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
      var size = cc.winSize;
     var ishu=_this.CanHuPai(_this.player1list,paitype);
-    console.log(paitype);
-    console.log(_this.player1list);
     var index = _this.player1penglist.indexOf(paitype);
 
     var isgang=false;
@@ -646,7 +661,7 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_chooseview_hu,
         res.p_ui_chooseview_hu,
         function () {
-          _this.doHu(paitype);
+          _this.doHu(paitype,outseat);
         }, this);
       hu.attr({
         x: size.width*0.95,
@@ -988,12 +1003,12 @@ var PlayLayer = cc.Layer.extend({
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:10,paitype:paitype,seat:_this.seat,fromseat:outseat});
 
-    _this.showP1Gang(paitype,outseat);
+    _this.showP1Gang(paitype);
   },
 
-  showP1Gang:function(paitype,outseat){
+  showP1Gang:function(paitype){
     var _this=this;
-    var showseat=(outseat+(4-_this.seat))%4;
+    // var showseat=(outseat+(4-_this.seat))%4;
     if (typeof  this.player1pai[13] != "undefined"){
       this.player1pai[13].removeFromParent();
       this.player1pai[13] = undefined;
@@ -1216,10 +1231,11 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  doHu:function(paitype){
+  doHu:function(paitype,outseat){
     console.log('hu',paitype);
+    this.hideChoose();
+    this._sioClient.emit('gameinfo',this.roomid,{code:12,paitype:paitype,seat:this.seat,fromseat:outseat});
     this.winGame();
-    _this.unscheduleAllCallbacks();
   },
 
   sortPai:function(isout,isfirst){
