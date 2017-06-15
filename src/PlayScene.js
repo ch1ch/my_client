@@ -623,8 +623,7 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
      var size = cc.winSize;
     var ishu=_this.CanHuPai(_this.player1list,paitype,self);
-    console.log(paitype);
-    console.log(_this.player1list);
+
     var index = _this.player1penglist.indexOf(paitype);
 
     var isgang=false;
@@ -653,7 +652,7 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_chooseview_hu,
         res.p_ui_chooseview_hu,
         function () {
-          _this.doHu(paitype);
+          _this.doHu(paitype,outseat);
         }, this);
       hu.attr({
         x: size.width*0.95,
@@ -994,12 +993,12 @@ var PlayLayer = cc.Layer.extend({
     // this.getChildByTag('peng').setVisible(false);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:10,paitype:paitype,seat:_this.seat,fromseat:outseat,playerid:this.playerid});
 
-    _this.showP1Gang(paitype,outseat);
+    _this.showP1Gang(paitype);
   },
 
-  showP1Gang:function(paitype,outseat){
+  showP1Gang:function(paitype){
     var _this=this;
-    var showseat=(outseat+(4-_this.seat))%4;
+    // var showseat=(outseat+(4-_this.seat))%4;
     if (typeof  this.player1pai[13] != "undefined"){
       this.player1pai[13].removeFromParent();
       this.player1pai[13] = undefined;
@@ -1223,7 +1222,6 @@ var PlayLayer = cc.Layer.extend({
       _this.player4pai.push(thing);
     }
   },
-
   doHu:function(paitype){
     var _this=this;
     console.log('hu',paitype);
@@ -1241,7 +1239,6 @@ var PlayLayer = cc.Layer.extend({
     });
     this.addChild(this.choose, 150);
   },
-
   sortPai:function(isout,isfirst){
     var _this=this;
     function sortNumber(a,b){
