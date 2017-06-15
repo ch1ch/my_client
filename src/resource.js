@@ -60,6 +60,7 @@ var res = {
     p_ui_chooseview_guo_s:"res/play/ui/guo_s.png",
     p_ui_chooseview_hu_b:"res/play/ui/hu_b.png",
 
+    p_ui_score:"res/play/ui/score.jpg",
 
     game_bg:"res/ui/bg.jpg",
     win_bg:"res/ui/win.png",
