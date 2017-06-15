@@ -1239,7 +1239,7 @@ var PlayLayer = cc.Layer.extend({
        x: size.width*0.5,
        y: size.height *0.3,
     });
-    this.addChild(this.choose, 15);
+    this.addChild(this.choose, 150);
   },
 
   sortPai:function(isout,isfirst){
