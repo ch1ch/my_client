@@ -60,7 +60,12 @@ var res = {
     p_ui_chooseview_guo_s:"res/play/ui/guo_s.png",
     p_ui_chooseview_hu_b:"res/play/ui/hu_b.png",
 
-    p_ui_score:"res/play/ui/score.jpg",
+    p_win_scorebg:"res/play/win/bg.jpg",
+    p_win_title:"res/play/win/title.png",
+    p_win_fang:"res/play/win/fang.png",
+    p_win_host:"res/play/win/host.png",
+    p_win_jie:"res/play/win/jie.png",
+    p_win_zhuang:"res/play/win/zhuang.png",
 
     game_bg:"res/ui/bg.jpg",
     win_bg:"res/ui/win.png",
