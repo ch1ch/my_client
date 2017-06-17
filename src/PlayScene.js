@@ -5,11 +5,13 @@ var PlayLayer = cc.Layer.extend({
   _sioClient:null,
   bgSprite:null,
   timeLabel:null,
+  furtruepaiLabel:null,
   circleSprites1:null,
   touchx:null,
   touchy:null,
   score:null,
-  choose:null,
+  winboard:null,
+  winpailist:[],
   paitypecn:["一万","二万","三万","四万","五万","六万","七万","八万","九万","一条","二条","三条","四条","五条","六条","七条","八条","九条","一筒","二筒","三筒","四筒","五筒","六筒","七筒","八筒","九筒","东","南","西","北","红","發","白"],
   paitype:[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,33],
   player1:[],
@@ -31,7 +33,6 @@ var PlayLayer = cc.Layer.extend({
   player3pengpai:[],
   player4pengpai:[],
   player1penglist:[],
-
   player1gang:0,
   player2gang:0,
   player3gang:0,
@@ -80,6 +81,15 @@ var PlayLayer = cc.Layer.extend({
       this.timeLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
       this.addChild(this.timeLabel, 35);
       this.timeLabel.setString('');
+
+      this.furtruepaiLabel = new cc.LabelTTF("0", "Arial", 26);
+      this.furtruepaiLabel.attr({
+         x: size.width*0.5,
+         y: size.height *0.4,
+      });
+      this.furtruepaiLabel.setFontFillColor(cc.color(239, 252, 97, 255)); 
+      this.addChild(this.furtruepaiLabel, 45);
+      this.furtruepaiLabel.setString('');
      
       var centerItem = new cc.MenuItemImage(
         res.p_ui_center,
@@ -262,16 +272,13 @@ var PlayLayer = cc.Layer.extend({
                   break;
                 }
               }
-            
-            
           }
         }
-       
-       
 
       }
       else if (msg.code==2) {
         console.log("game start");
+        _this.playerinfo=msg.playerinfo;
         sioclient.emit('gameinfo',msg.roomid,{code:1,player:_this.playerid});
       };            
     });
@@ -285,6 +292,8 @@ var PlayLayer = cc.Layer.extend({
         _this.player1=msg.pais;
         _this.seat=msg.seat;
         console.log(_this.player1list);
+         _this.furtruepaiLabel.setString('剩余83张');
+
         _this.initPlayer(msg.turnseat);
       }else if (msg.code==5){ //code 5 出牌
         var theseat=msg.seat;
@@ -356,7 +365,7 @@ var PlayLayer = cc.Layer.extend({
             _this.showP4Gang(paitype,fromseat);
             break;
         }
-      }else if (msg.code==13){
+      }else if (msg.code==13){ //有人虎牌
 
         var hubig = new cc.MenuItemImage(
           res.p_ui_chooseview_hu_b,
@@ -378,8 +387,10 @@ var PlayLayer = cc.Layer.extend({
           _this.removeChild(winMenu); 
           _this.showhuscore(msg);
         })
-        
-       
+      }else if (msg.code==15){//剩余牌倒计时
+        console.log()
+        _this.furtruepaiLabel.setString('剩余'+msg.furturepai+'张');
+
       }
     });
   },
@@ -689,16 +700,6 @@ var PlayLayer = cc.Layer.extend({
       _this.player4pai.push(thing);
     // };
   
-  },
-
-  showChoose:function(){
-    this.choose = new cc.Sprite(res.p_ui_choose);
-    var size = cc.winSize;
-    this.choose.attr({
-       x: size.width*0.5,
-       y: size.height *0.3,
-    });
-    this.addChild(this.choose, 15);
   },
 
   checkChoose:function(paitype,self,outseat){
@@ -1090,10 +1091,10 @@ var PlayLayer = cc.Layer.extend({
     }
 
     var newplayer1=[];
-    console.log('player1.length',this.player1.length);
+    //console.log('player1.length',this.player1.length);
     for (var i = 0; i < this.player1.length; i++) {
       if (this.player1[i]==paitype) {
-        console.log('is ',i);
+        //console.log('is ',i);
         this.player1pai[i].removeFromParent();
         this.player1pai[i] = null;
         this.player1list[paitype]--;
@@ -1102,7 +1103,7 @@ var PlayLayer = cc.Layer.extend({
         newplayer1.push(this.player1[i]);
       }
     }
-    console.log('player1.length',newplayer1.length);
+    //console.log('player1.length',newplayer1.length);
 
     for (var i = _this.player1pai.length-1; i >=0; i--) {
       if (_this.player1pai[i] ==null) {
@@ -1137,7 +1138,7 @@ var PlayLayer = cc.Layer.extend({
       _this.player1gangpai.push(thing);
     }
     window.isPlay=true;
-    console.log(_this["player1"]);
+    //console.log(_this["player1"]);
     _this.showCountDown(_this.turncountdown,function(){
         _this.outPai(_this["player1"]-1,paitype);
     })
@@ -1305,10 +1306,11 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  doHu:function(paitype){
+  doHu:function(paitype,outseat){
     var _this=this;
-    console.log('hu',paitype);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:12,paitype:paitype,seat:_this.seat,playerid:this.playerid});
+    //console.log('hu',paitype);
+    //console.log(_this.playerinfo);
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:12,paitype:paitype,seat:_this.seat,playerid:this.playerid,outseat:outseat});
     this.hideChoose();
     
   },
@@ -1316,14 +1318,14 @@ var PlayLayer = cc.Layer.extend({
   showhuscore:function(data){
     var size = cc.winSize;
     var _this=this;
-    this.choose = new cc.Sprite(res.p_win_scorebg);
-    this.choose.attr({
+    this.winboard = new cc.Sprite(res.p_win_scorebg);
+    this.winboard.attr({
       x: size.width*0.5,
       y: size.height *0.5,
         anchorX: 0.5,
         anchorY: 0.5
     });
-    this.addChild(this.choose, 150);
+    this.addChild(this.winboard, 150);
 
     var scoreTitle = new cc.Sprite(res.p_win_title);
     scoreTitle.attr({
@@ -1332,10 +1334,96 @@ var PlayLayer = cc.Layer.extend({
       anchorX: 0.5,
       anchorY: 0.5
     });
-    _this.choose.addChild(scoreTitle,5);
+    _this.winboard.addChild(scoreTitle,5);
+    //console.log(data);
 
 
+    var gamenumLabel = new cc.LabelTTF('第'+data.gamenum+'轮', "Arial", 26);
+    gamenumLabel.attr({
+           x: size.width*0.8,
+           y: size.height *(0.75),
+      });
+    gamenumLabel.setFontFillColor(cc.color(255, 255, 255, 255)); 
+    _this.winboard.addChild(gamenumLabel, 55);
 
+    var thelist=[0,1,2,3];
+    if (data.seat!=0) {
+      thelist[0]=data.seat;
+      thelist[data.seat]=0;
+    }
+    if (data.fromseat!=5) {
+      var jiepaoimg = new cc.Sprite(res.p_win_jie);
+      jiepaoimg.attr({
+        x: size.width*0.2,
+        y: size.height *0.75
+      });
+      _this.winboard.addChild(jiepaoimg,5);
+    }
+
+    var hostimg = new cc.Sprite(res.p_win_host);
+    var hosty=data.seat==0?0.75:0.58;
+    hostimg.attr({
+      x: size.width*0.06,
+      y: size.height *hosty
+    });
+    _this.winboard.addChild(hostimg,5);
+
+
+    console.log(_this.playerinfo);
+    for (var i = 0; i < 4; i++) {
+      function sortNumber(a,b){
+        return a - b;
+      }
+      data.nowpai[i].sort(sortNumber);
+      //var winnameLabel = new cc.LabelTTF('张三', "Arial", 26);
+      var winnameLabel = new cc.LabelTTF(_this.playerinfo[thelist[i]].playername, "Arial", 26);
+        winnameLabel.attr({
+           x: size.width*0.12,
+           y: size.height *(0.748-i*0.163),
+      });
+      winnameLabel.setFontFillColor(cc.color(255, 255, 255, 255)); 
+      _this.winboard.addChild(winnameLabel, 55);
+
+      if (thelist[i]==data.turn) {
+        var zhuangimg = new cc.Sprite(res.p_win_zhuang);
+        var zhuangimgposy=size.height *(0.675-i*0.167);
+        if (i==3) {zhuangimgposy+=10}
+        zhuangimg.attr({
+          x: size.width*0.125,
+          y: zhuangimgposy
+        });
+        _this.winboard.addChild(zhuangimg,5);
+      }
+
+      var posx=size.width*0.18;
+      var posy=size.height*(0.673-i*0.162);
+      for (var j = 0; j < 13; j++) {
+        var thing = new PaiSprite(res["p_pai"+data.nowpai[thelist[i]][j]]);
+
+        thing.attr({
+            x: posx,
+            y:posy
+        });
+        posx+=50;
+        thing.setAnchorPoint(0.5,0.5);
+        thing.setScaleX(48/thing.getContentSize().width);
+        thing.setScaleY(60/thing.getContentSize().height);
+        _this.winboard.addChild(thing,15);
+        _this.winpailist.push(thing);
+      }
+
+       var thing = new PaiSprite(res["p_pai"+data.paitype]);
+        thing.attr({
+            x: size.width*0.7,
+            y:size.height*0.673
+        });
+        thing.setAnchorPoint(0.5,0.5);
+        thing.setScaleX(48/thing.getContentSize().width);
+        thing.setScaleY(60/thing.getContentSize().height);
+        _this.winboard.addChild(thing,15);
+        _this.winpailist.push(thing);
+
+    }
 
   },
 
