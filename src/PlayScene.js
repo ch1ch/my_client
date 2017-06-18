@@ -150,7 +150,7 @@ var PlayLayer = cc.Layer.extend({
 
      //玩家信息
       _this.initLayer();
-      // _this.showhuscore();
+     // _this.showhuscore();
   },
 
   onExit: function() {
@@ -367,6 +367,7 @@ var PlayLayer = cc.Layer.extend({
         }
       }else if (msg.code==13){ //有人虎牌
 
+        _this.hideChoose();
         var hubig = new cc.MenuItemImage(
           res.p_ui_chooseview_hu_b,
           res.p_ui_chooseview_hu_b,
@@ -381,14 +382,12 @@ var PlayLayer = cc.Layer.extend({
         hubig_menu.x = 0;
         hubig_menu.y = 0;
         _this.addChild(hubig_menu, 150,'hubig_menu');
-
         _this.showCountDown(2,function(){
           var winMenu = _this.getChildByName("winMenu");
           _this.removeChild(winMenu); 
           _this.showhuscore(msg);
         })
       }else if (msg.code==15){//剩余牌倒计时
-        console.log()
         _this.furtruepaiLabel.setString('剩余'+msg.furturepai+'张');
 
       }
@@ -706,6 +705,7 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
      var size = cc.winSize;
     var ishu=_this.CanHuPai(_this.player1list,paitype,self);
+    //返回0 没胡牌，七小对1，普通2
 
     var index = _this.player1penglist.indexOf(paitype);
 
@@ -735,7 +735,7 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_chooseview_hu,
         res.p_ui_chooseview_hu,
         function () {
-          _this.doHu(paitype,outseat);
+          _this.doHu(paitype,outseat,ishu);
         }, this);
       hu.attr({
         x: size.width*0.95,
@@ -1306,11 +1306,11 @@ var PlayLayer = cc.Layer.extend({
     }
   },
 
-  doHu:function(paitype,outseat){
+  doHu:function(paitype,outseat,hutype){
     var _this=this;
     //console.log('hu',paitype);
     //console.log(_this.playerinfo);
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:12,paitype:paitype,seat:_this.seat,playerid:this.playerid,outseat:outseat});
+    _this._sioClient.emit('gameinfo',_this.roomid,{code:12,paitype:paitype,seat:_this.seat,playerid:this.playerid,outseat:outseat,hutype:hutype});
     this.hideChoose();
     
   },
@@ -1318,6 +1318,9 @@ var PlayLayer = cc.Layer.extend({
   showhuscore:function(data){
     var size = cc.winSize;
     var _this=this;
+    console.log(data);
+    //var data={fromseat:2,seat:1,turn:3,gamenum:1,nowpai:[[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9]],paitype:12};
+
     this.winboard = new cc.Sprite(res.p_win_scorebg);
     this.winboard.attr({
       x: size.width*0.5,
@@ -1351,10 +1354,20 @@ var PlayLayer = cc.Layer.extend({
       thelist[0]=data.seat;
       thelist[data.seat]=0;
     }
-    if (data.fromseat!=5) {
+
+     var huimg = new cc.Sprite(res.p_ui_chooseview_hu);
+      huimg.attr({
+        x: size.width*0.79,
+        y: size.height *0.68
+      });
+      huimg.setScaleX(100/huimg.getContentSize().width);
+      huimg.setScaleY(70/huimg.getContentSize().height);
+      _this.winboard.addChild(huimg,5);
+
+    if (data.fromseat!=data.seat) {
       var jiepaoimg = new cc.Sprite(res.p_win_jie);
       jiepaoimg.attr({
-        x: size.width*0.2,
+        x: size.width*0.3,
         y: size.height *0.75
       });
       _this.winboard.addChild(jiepaoimg,5);
@@ -1368,13 +1381,17 @@ var PlayLayer = cc.Layer.extend({
     });
     _this.winboard.addChild(hostimg,5);
 
+    var socrelist=_this.getScore(data,thelist);
 
-    console.log(_this.playerinfo);
+    console.log(socrelist);
+    //console.log(_this.playerinfo);
     for (var i = 0; i < 4; i++) {
       function sortNumber(a,b){
         return a - b;
       }
       data.nowpai[i].sort(sortNumber);
+
+      //玩家名字
       //var winnameLabel = new cc.LabelTTF('张三', "Arial", 26);
       var winnameLabel = new cc.LabelTTF(_this.playerinfo[thelist[i]].playername, "Arial", 26);
         winnameLabel.attr({
@@ -1383,6 +1400,16 @@ var PlayLayer = cc.Layer.extend({
       });
       winnameLabel.setFontFillColor(cc.color(255, 255, 255, 255)); 
       _this.winboard.addChild(winnameLabel, 55);
+
+      //积分
+      var scoreLabel = new cc.LabelTTF(socrelist[thelist[i]], "Arial", 26);
+        scoreLabel.attr({
+           x: size.width*0.85,
+           y: size.height *(0.68-i*0.163),
+      });
+      scoreLabel.setFontFillColor(cc.color(255, 255, 255, 255)); 
+      _this.winboard.addChild(scoreLabel, 55);
+
 
       if (thelist[i]==data.turn) {
         var zhuangimg = new cc.Sprite(res.p_win_zhuang);
@@ -1393,6 +1420,15 @@ var PlayLayer = cc.Layer.extend({
           y: zhuangimgposy
         });
         _this.winboard.addChild(zhuangimg,5);
+      }
+
+      if (data.fromseat!=data.seat &&data.fromseat==thelist[i]) {
+        var fangpaoimg = new cc.Sprite(res.p_win_fang);
+        fangpaoimg.attr({
+          x: size.width*0.3,
+          y: size.height *(0.75-i*0.162)
+        });
+        _this.winboard.addChild(fangpaoimg,5);
       }
 
       var posx=size.width*0.18;
@@ -1427,13 +1463,138 @@ var PlayLayer = cc.Layer.extend({
 
   },
 
+  getScore:function(data,thelist){
+    var score=[0,0,0,0];
+    var winner=data.seat;
+    var loser=data.fromseat;
+    var winpailist=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+    for (var i = 0; i <data.nowpai[winner].length; i++) {
+      winpailist[data.nowpai[winner][i]]++;
+    }
+    //判断杠
+    for (var i = 0; i <4; i++) {
+      if (data.ganglist[i].length>0) {
+        for (var j = 0; j < data.ganglist[i].length; j++) {
+          if (data.ganglist[i][j].seat==data.ganglist[i][j].fromseat) {
+            for (var k = 0; k <4; k++) {
+              if (i==data.ganglist[i][j].seat) {
+                score[i]+=30;
+              }else{
+                score[i]-=10;
+              }
+            }
+          }else{
+            score[data.ganglist[i][j].seat]+=15;
+            score[data.ganglist[i][j].fromseat]+=15;
+
+          }
+          
+        }
+      }
+      
+    }
+
+    //
+    var winscore=1;
+    //自摸
+    if (winner==loser) {
+      winscore*=2;
+    }
+    //console.log(winscore)
+
+
+
+    //庄家
+    if (winner==data.turn) {
+      winscore*=2;
+    }
+    //console.log(winscore)
+
+
+
+    //七小对
+    if (data.hutype==1) {
+      winscore*=2;
+      var big7=0;
+      for (var i = 0; i < 11; i++) {
+        if (data.nowpai[winner][i]==data.nowpai[winner][i+1] && data.nowpai[winner][i]==data.nowpai[winner][i+2] && data.nowpai[winner][i]==data.nowpai[winner][i+3] ) {
+          big7+=1;
+          winscore*=2;
+        }
+      }
+      if(big7>0){
+        winscore*=2;
+      }
+    }
+    //console.log(winscore)
+
+    //清一色
+    var isqing=0;
+    if (data.nowpai[winner][0]<=8) {
+      isqing=1;
+      for (var i = 1; i < 13; i++) {
+        if(data.nowpai[winner][i]>8){
+          isqing=0;
+        }
+      }
+    }else if (data.nowpai[winner][0]>8 && data.nowpai[winner][0]<=17) {
+      isqing=2;
+      for (var i = 1; i < 13; i++) {
+        if(data.nowpai[winner][0]<8 && data.nowpai[winner][0]>17){
+          isqing=0;
+        }
+      }
+    }else if (data.nowpai[winner][0]>17&& data.nowpai[winner][0]<=26) {
+      isqing=3;
+      for (var i = 1; i < 13; i++) {
+        if(data.nowpai[winner][0]<17&& data.nowpai[winner][0]>26){
+          isqing=0;
+        }
+      }
+    }
+    if (isqing>0) {
+      winscore*=2;
+    }
+    //console.log(winscore)
+
+    //龙
+    var long=false;
+    if (winpailist[0] && winpailist[1] && winpailist[2] && winpailist[3] && winpailist[4] && winpailist[5] && winpailist[6] && winpailist[7] && winpailist[8]) {
+      long=true;
+    }else if (winpailist[10] && winpailist[11] && winpailist[12] && winpailist[13] && winpailist[14] && winpailist[15] && winpailist[16] && winpailist[17] && winpailist[9]) {
+      long=true;
+    }else if (winpailist[20] && winpailist[21] && winpailist[22] && winpailist[23] && winpailist[24] && winpailist[25] && winpailist[26] && winpailist[18] && winpailist[19]) {
+      long=true;
+    }
+    if (long) {winscore*=2;}
+    if (long && isqing>0) {winscore*=2;}
+    // console.log(winscore);
+    
+    if (winner==loser) {
+     for (var i = 0; i < 4; i++) {
+       if (winner==i) {
+        score[winner]+=(winscore*3);
+       }else{
+        score[i]-=winscore;
+       }
+     }
+    }else{
+      score[winner]+=(winscore*4);
+      score[loser]-=(winscore*4);
+    }
+    console.log(winscore)
+
+    return score;
+  },
+
   sortPai:function(isout,isfirst){
     var _this=this;
     function sortNumber(a,b){
       return a - b;
     }
     _this.player1.sort(sortNumber);
-    console.log('sort--');
+    //console.log('sort--');
     //console.log('ll ',_this.player1.length);
     //console.log( _this.player1pai.length);
 
