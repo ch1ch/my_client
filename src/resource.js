@@ -8,6 +8,8 @@ var res = {
 
     s_bg:"res/stage/bg.jpg",
     s_creat:"res/stage/creat.jpg",
+    s_join:"res/stage/join.png",
+    s_bottom:"res/stage/bottom.png",
 
     p_bk:"res/play/bk.jpg",
     p_pai0:"res/play/pai/1w.png",

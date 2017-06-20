@@ -148,9 +148,13 @@ var PlayLayer = cc.Layer.extend({
       infomenu.y = 0;
       this.addChild(infomenu, 35);
 
-
+      if (stagenum==1) {
+        this.gamestartClicked()
+      }else  if (stagenum==2) {
+        this.onMenuSIOClientClicked();
+      }
      //玩家信息
-      _this.initLayer();
+      //_this.initLayer();
      // _this.showhuscore();
   },
 
@@ -159,7 +163,7 @@ var PlayLayer = cc.Layer.extend({
       if(this._sioClient) this._sioClient.disconnect();
 
       this._super();
-  },ead
+  },
   initLayer:function() {
     var size = cc.winSize;
 
@@ -199,16 +203,6 @@ var PlayLayer = cc.Layer.extend({
       itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
       menuRequest.addChild(itemSIOEndpoint);          
      
-  },
-
-  message: function(data) {
-      var msg = this.tag + " received message: " + data;
-      console.log(msg);
-  },
-
-  disconnection: function() {
-      var msg = this.tag + " disconnected!";
-      console.log(msg);
   },
  
   socketinit:function(){
