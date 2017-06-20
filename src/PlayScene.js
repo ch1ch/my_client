@@ -1555,16 +1555,7 @@ var PlayLayer = cc.Layer.extend({
         _this.winboard.addChild(thing,15);
         _this.winpailist.push(thing);
 
-
-
     }
-
-
-
-
-
-
-
 
 
 
@@ -1889,7 +1880,12 @@ var PlayLayer = cc.Layer.extend({
 
   newGame:function(turn,seat){
     var _this=this;
-    _this._sioClient.emit('roominfo',_this.roomid,{code:4,seat:_this.seat});
+    if (seat==_this.seat) {
+       _this._sioClient.emit('roominfo',_this.roomid,{code:4,seat:seat});
+    };
+   
+     // sioclient.emit('roominfo',_this.roomid,{code:2,gametype:gametype,rule:rule,playernum:playernum,userid:userid,imghead:imghead});
+    console.log(turn,seat)
 
     this.hideChoose();
     _this.player1list=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
