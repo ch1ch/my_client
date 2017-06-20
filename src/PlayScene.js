@@ -42,14 +42,14 @@ var PlayLayer = cc.Layer.extend({
   player3gangpai:[],
   player4gangpai:[],
   player1ganglist:[],
-  
+  showscore:false,
   isPlay:false,
   allpai:new Array(136),
   painum:0,
   roomid:0,
   playerid:0,
   seat:null,
-  turncountdown:20,
+  turncountdown:200,
   waitcountdown:3,
   sockt_server:"ws://127.0.0.1:3010",
   ctor:function (stagenum) {
@@ -79,7 +79,7 @@ var PlayLayer = cc.Layer.extend({
          y: size.height *0.5,
       });
       this.timeLabel.setFontFillColor(cc.color(226, 39, 107, 255)); 
-      this.addChild(this.timeLabel, 35);
+      this.addChild(this.timeLabel, 3500);
       this.timeLabel.setString('');
 
       this.furtruepaiLabel = new cc.LabelTTF("0", "Arial", 26);
@@ -171,14 +171,14 @@ var PlayLayer = cc.Layer.extend({
       var vspace = 80;
 
         // Test to create basic client in the default namespace
-      var labelSIOClient = new cc.LabelTTF("Open SocketIO Client", "Arial", 38);
+      var labelSIOClient = new cc.LabelTTF("join game", "Arial", 38);
       labelSIOClient.setAnchorPoint(cc.p(0,0));
       var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
       itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
       menuRequest.addChild(itemSIOClient,50);
 
       // Test sending message to default namespace
-      var labelTestMessage = new cc.LabelTTF("Send Test Message", "Arial", 38);
+      var labelTestMessage = new cc.LabelTTF("clean user", "Arial", 38);
       labelTestMessage.setAnchorPoint(cc.p(0,0));
       var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
       itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
@@ -197,7 +197,6 @@ var PlayLayer = cc.Layer.extend({
       var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
       itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
       menuRequest.addChild(itemSIOEndpoint);          
-
      
   },
 
@@ -229,7 +228,7 @@ var PlayLayer = cc.Layer.extend({
     });
 
     sioclient.on('roominfo', function (userName, msg) {
-      console.log('roominfo',userName,msg);
+      //console.log('roominfo',userName,msg);
       //code 2 人齐了可以开始
       if (msg.code==1){
        
@@ -279,6 +278,7 @@ var PlayLayer = cc.Layer.extend({
       else if (msg.code==2) {
         console.log("game start");
         _this.playerinfo=msg.playerinfo;
+
         sioclient.emit('gameinfo',msg.roomid,{code:1,player:_this.playerid});
       };            
     });
@@ -289,11 +289,16 @@ var PlayLayer = cc.Layer.extend({
         for (var i = 0; i < msg.pais.length; i++) {
           _this.player1list[msg.pais[i]]++;
         }
+        if (msg.turnseat== _this.seat) {window.isPlay==true;};
+        //console.log(msg.scorelist);
         _this.player1=msg.pais;
         _this.seat=msg.seat;
         console.log(_this.player1list);
-         _this.furtruepaiLabel.setString('剩余83张');
-
+        _this.furtruepaiLabel.setString('剩余83张');
+        _this.scorelist=msg.scorelist;
+        if (!_this.showscore) {
+          _this.showplayerscore(msg.scorelist);
+        };
         _this.initPlayer(msg.turnseat);
       }else if (msg.code==5){ //code 5 出牌
         var theseat=msg.seat;
@@ -382,6 +387,8 @@ var PlayLayer = cc.Layer.extend({
         hubig_menu.x = 0;
         hubig_menu.y = 0;
         _this.addChild(hubig_menu, 150,'hubig_menu');
+
+
         _this.showCountDown(2,function(){
           var winMenu = _this.getChildByName("winMenu");
           _this.removeChild(winMenu); 
@@ -413,6 +420,7 @@ var PlayLayer = cc.Layer.extend({
     }, interval, repeat, delay);
    
   },
+
 
   onMenuTestMessageClicked: function(sender) {
     var _this=this;
@@ -576,6 +584,69 @@ var PlayLayer = cc.Layer.extend({
     });
     this.player4nameLabel.setFontFillColor(cc.color(255,255,255, 255)); 
     this.addChild(this.player4nameLabel, 35);
+  },
+
+
+  showplayerscore:function(scorelist){
+    var size = cc.winSize;
+    var _this=this;
+    if (this.showscore) {
+      _this.player1scoreLabel.setString(scorelist[0]);
+      _this.player2scoreLabel.setString(scorelist[1]);
+      _this.player3scoreLabel.setString(scorelist[2]);
+      _this.player4scoreLabel.setString(scorelist[3]);
+    }else{
+
+
+      this.player1scoreLabel = new cc.LabelTTF(scorelist[0], "Arial", 24);
+      this.player1scoreLabel.attr({
+          x:70,
+          y:160,
+          anchorX: 0.5,
+          anchorY: 0.5
+      });
+      this.player1scoreLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+      this.addChild(this.player1scoreLabel, 35);
+
+
+      this.player2scoreLabel = new cc.LabelTTF(scorelist[1], "Arial", 24);
+      this.player2scoreLabel.attr({
+          x:80,
+          y:380,
+          anchorX: 0.5,
+          anchorY: 0.5
+      });
+      this.player2scoreLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+      this.addChild(this.player2scoreLabel, 35);
+
+
+
+
+      this.player3scoreLabel = new cc.LabelTTF(scorelist[2], "Arial", 24);
+      this.player3scoreLabel.attr({
+        x: size.width*0.29,
+        y: size.height *0.77,
+        anchorX: 0.5,
+        anchorY: 0.5
+      });
+      this.player3scoreLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+      this.addChild(this.player3scoreLabel, 35);
+
+
+
+
+      this.player4scoreLabel = new cc.LabelTTF(scorelist[3], "Arial", 24);
+      this.player4scoreLabel.attr({
+        x: size.width*0.92,
+        y: size.height *0.52,
+        anchorX: 0.5,
+        anchorY: 0.5
+      });
+      this.player4scoreLabel.setFontFillColor(cc.color(255,255,255, 255)); 
+      this.addChild(this.player4scoreLabel, 35);
+
+       this.showscore=true;
+    }
   },
 
   initPlayer:function(turnseat){
@@ -1362,7 +1433,7 @@ var PlayLayer = cc.Layer.extend({
       });
       huimg.setScaleX(100/huimg.getContentSize().width);
       huimg.setScaleY(70/huimg.getContentSize().height);
-      _this.winboard.addChild(huimg,5);
+      _this.winboard.addChild(huimg,5,'bighuimg');
 
     if (data.fromseat!=data.seat) {
       var jiepaoimg = new cc.Sprite(res.p_win_jie);
@@ -1383,7 +1454,6 @@ var PlayLayer = cc.Layer.extend({
 
     var socrelist=_this.getScore(data,thelist);
 
-    console.log(socrelist);
     //console.log(_this.playerinfo);
     for (var i = 0; i < 4; i++) {
       function sortNumber(a,b){
@@ -1459,13 +1529,32 @@ var PlayLayer = cc.Layer.extend({
         _this.winboard.addChild(thing,15);
         _this.winpailist.push(thing);
 
+
+
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    _this.showCountDown(3,function(){
+      _this.newGame(data.turn,data.seat);
+    });
   },
 
   getScore:function(data,thelist){
     var score=[0,0,0,0];
     var winner=data.seat;
+    var _this=this;
     var loser=data.fromseat;
     var winpailist=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
@@ -1489,12 +1578,9 @@ var PlayLayer = cc.Layer.extend({
             score[data.ganglist[i][j].fromseat]+=15;
 
           }
-          
         }
       }
-      
     }
-
     //
     var winscore=1;
     //自摸
@@ -1503,15 +1589,11 @@ var PlayLayer = cc.Layer.extend({
     }
     //console.log(winscore)
 
-
-
     //庄家
     if (winner==data.turn) {
       winscore*=2;
     }
     //console.log(winscore)
-
-
 
     //七小对
     if (data.hutype==1) {
@@ -1583,8 +1665,13 @@ var PlayLayer = cc.Layer.extend({
       score[winner]+=(winscore*4);
       score[loser]-=(winscore*4);
     }
-    console.log(winscore)
-
+    console.log(winscore);
+    for (var i = 0; i < 4; i++) {
+      var tmp=this.scorelist[i]+score[i];
+      
+     _this['player'+(i+1)+'scoreLabel'].setString(tmp);
+    };
+    //this.player1scoreLabel.setString('123');
     return score;
   },
 
@@ -1771,8 +1858,11 @@ var PlayLayer = cc.Layer.extend({
     _this.player4outpai.push(thing);
   },
 
-  newGame:function(){
+  newGame:function(turn,seat){
     var _this=this;
+    _this._sioClient.emit('roominfo',_this.roomid,{code:4,seat:_this.seat});
+
+    this.hideChoose();
     _this.player1list=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
     for (var i =_this.player1pai.length-1; i >= 0; i--) {
@@ -1868,7 +1958,24 @@ var PlayLayer = cc.Layer.extend({
         _this.player4pengpai.splice(i,1);
       }
     };
-      _this.player1pai=[];
+
+    var bighuimg = _this.getChildByName("hubig_menu");
+    _this.removeChild(bighuimg); 
+    
+
+    _this.winboard.removeFromParent();
+    _this.winboard= null;
+
+    for (var i =_this.winpailist.length-1; i >= 0; i--) {
+      if (typeof  _this.winpailist[i] != "undefined"){
+        _this.winpailist[i].removeFromParent();
+        _this.winpailist[i] = undefined;
+        _this.winpailist.splice(i,1);
+      }
+    };
+
+
+    _this.player1pai=[];
     _this.player2pai=[];
     _this.player3pai=[];
     _this.player4pai=[];
@@ -1886,6 +1993,7 @@ var PlayLayer = cc.Layer.extend({
     _this.player4pengpai=[];
 
     this.hideChoose();
+
   },
  
   CanHuPai__7pair:function (arr){
@@ -2359,8 +2467,7 @@ var PlayLayer = cc.Layer.extend({
 
 });
 
-var PlayScene = cc.Scene.extend(
-{
+var PlayScene = cc.Scene.extend({
    ctor:function (data) 
     {
       this._super();
