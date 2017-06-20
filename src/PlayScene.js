@@ -44,6 +44,7 @@ var PlayLayer = cc.Layer.extend({
   player1ganglist:[],
   showscore:false,
   isPlay:false,
+  isGangHua:false,
   allpai:new Array(136),
   painum:0,
   roomid:0,
@@ -158,7 +159,7 @@ var PlayLayer = cc.Layer.extend({
       if(this._sioClient) this._sioClient.disconnect();
 
       this._super();
-  },
+  },ead
   initLayer:function() {
     var size = cc.winSize;
 
@@ -286,6 +287,9 @@ var PlayLayer = cc.Layer.extend({
     sioclient.on('gameinfo', function (userName, msg) {
       //console.log('gameinfo',userName,msg);
       if (msg.code==3) {//code 3游戏开始
+        if (_this.player1.length>0) {
+          return false;
+        }
         for (var i = 0; i < msg.pais.length; i++) {
           _this.player1list[msg.pais[i]]++;
         }
@@ -294,15 +298,18 @@ var PlayLayer = cc.Layer.extend({
         _this.player1=msg.pais;
         _this.seat=msg.seat;
         console.log(_this.player1list);
+
         _this.furtruepaiLabel.setString('剩余83张');
         _this.scorelist=msg.scorelist;
         if (!_this.showscore) {
           _this.showplayerscore(msg.scorelist);
         };
+
         _this.initPlayer(msg.turnseat);
       }else if (msg.code==5){ //code 5 出牌
         var theseat=msg.seat;
         var paitype=msg.outpaitype;
+        window.isGangHua=false;
         if (theseat!=_this.seat) {
           var showseat=(theseat+(4-_this.seat))%4;
           // console.log(showseat);
@@ -324,7 +331,6 @@ var PlayLayer = cc.Layer.extend({
         }
 
         var nextseat=msg.nextseat;
-        // console.log(nextseat);
         _this.showCountDown(_this.waitcountdown,function(){
 
             _this.hideChoose();
@@ -334,8 +340,9 @@ var PlayLayer = cc.Layer.extend({
           }
         })
       }else if (msg.code==7){ //抓牌
-         _this.AddPai(msg.nextpai);
-         window.isPlay=true;
+        window.isGangHua=false;
+        _this.AddPai(msg.nextpai);
+        window.isPlay=true;
       }else if (msg.code==9){ //别人碰牌
         var paitype=msg.paitype;
         var showseat=(msg.seat+(4-_this.seat))%4;
@@ -370,6 +377,10 @@ var PlayLayer = cc.Layer.extend({
             _this.showP4Gang(paitype,fromseat);
             break;
         }
+      }else if (msg.code==111){ //gangshanghua
+         _this.AddPai(msg.nextpai,msg.fromseat);
+         window.isPlay=true;
+         window.isGangHua=true;
       }else if (msg.code==13){ //有人虎牌
 
         _this.hideChoose();
@@ -792,7 +803,7 @@ var PlayLayer = cc.Layer.extend({
     if (!self) {
       ispeng=((index == -1 ) && (_this.player1list[paitype]>=2))?true:false;
     }
-    console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng);
+    console.log(paitype,_this.player1list[paitype],ishu,isgang,ispeng,outseat);
      // ishu=true;
      // isgang=true;
      // ispeng=true;
@@ -807,7 +818,7 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_chooseview_hu,
         function () {
           _this.doHu(paitype,outseat,ishu);
-        }, this);
+        }, _this);
       hu.attr({
         x: size.width*0.95,
         y: size.height *0.0,
@@ -819,7 +830,7 @@ var PlayLayer = cc.Layer.extend({
       _hu.y = 0;
       _hu.setScaleX(146/hu.getContentSize().width);
       _hu.setScaleY(90/hu.getContentSize().height);
-      this.addChild(_hu, 35,'hu');
+      _this.addChild(_hu, 35,'hu');
    
     }
 
@@ -828,7 +839,7 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_chooseview_gang,
         res.p_ui_chooseview_gang,
         function () {
-          _this.doGang(paitype);
+          _this.doGang(paitype,outseat);
         }, this);
       gang.attr({
         x: size.width*0.84,
@@ -1141,7 +1152,7 @@ var PlayLayer = cc.Layer.extend({
   },
 
   doGang:function(paitype,outseat){
-    console.log('gang',paitype);
+    console.log('gang',paitype,outseat);
     var _this=this;
     this.hideChoose();
     // this.getChildByTag('peng').setVisible(false);
@@ -1379,7 +1390,7 @@ var PlayLayer = cc.Layer.extend({
 
   doHu:function(paitype,outseat,hutype){
     var _this=this;
-    //console.log('hu',paitype);
+    console.log('hu',paitype,outseat,hutype);
     //console.log(_this.playerinfo);
     _this._sioClient.emit('gameinfo',_this.roomid,{code:12,paitype:paitype,seat:_this.seat,playerid:this.playerid,outseat:outseat,hutype:hutype});
     this.hideChoose();
@@ -1390,6 +1401,8 @@ var PlayLayer = cc.Layer.extend({
     var size = cc.winSize;
     var _this=this;
     console.log(data);
+    var winner=data.seat;
+    var loser=data.fromseat;
     //var data={fromseat:2,seat:1,turn:3,gamenum:1,nowpai:[[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9],[1,1,1,2,3,4,5,6,7,8,9,9,9]],paitype:12};
 
     this.winboard = new cc.Sprite(res.p_win_scorebg);
@@ -1421,10 +1434,22 @@ var PlayLayer = cc.Layer.extend({
     _this.winboard.addChild(gamenumLabel, 55);
 
     var thelist=[0,1,2,3];
-    if (data.seat!=0) {
-      thelist[0]=data.seat;
-      thelist[data.seat]=0;
+    switch(data.seat){
+      case 1:
+        thelist=[1,0,2,3];
+        break;
+      case 2:
+        thelist=[2,0,1,3];
+        break;
+      case 3:
+        thelist=[3,0,1,2];
+        break;
     }
+    // if (data.seat!=0) {
+    //   thelist[0]=data.seat;
+
+    //   thelist[data.seat]=0;
+    // }
 
      var huimg = new cc.Sprite(res.p_ui_chooseview_hu);
       huimg.attr({
@@ -1501,9 +1526,15 @@ var PlayLayer = cc.Layer.extend({
         _this.winboard.addChild(fangpaoimg,5);
       }
 
+      var hidepaitype = (i==0 && winner==loser)?true:false;
+
       var posx=size.width*0.18;
       var posy=size.height*(0.673-i*0.162);
-      for (var j = 0; j < 13; j++) {
+      for (var j = 0; j < data.nowpai[thelist[i]].length; j++) {
+        if (hidepaitype && data.nowpai[thelist[i]][j]==data.paitype) {
+          hidepaitype=false;
+          continue;
+        }
         var thing = new PaiSprite(res["p_pai"+data.nowpai[thelist[i]][j]]);
 
         thing.attr({
@@ -1517,6 +1548,7 @@ var PlayLayer = cc.Layer.extend({
         _this.winboard.addChild(thing,15);
         _this.winpailist.push(thing);
       }
+
 
        var thing = new PaiSprite(res["p_pai"+data.paitype]);
         thing.attr({
@@ -1575,25 +1607,28 @@ var PlayLayer = cc.Layer.extend({
             }
           }else{
             score[data.ganglist[i][j].seat]+=15;
-            score[data.ganglist[i][j].fromseat]+=15;
+            score[data.ganglist[i][j].fromseat]-=15;
 
           }
         }
       }
     }
-    //
     var winscore=1;
+    
+    //gangshanghua
+    if (window.isGangHua) {
+      winscore*=2;
+    }
+
     //自摸
     if (winner==loser) {
       winscore*=2;
     }
-    //console.log(winscore)
 
     //庄家
     if (winner==data.turn) {
       winscore*=2;
     }
-    //console.log(winscore)
 
     //七小对
     if (data.hutype==1) {
@@ -1609,7 +1644,7 @@ var PlayLayer = cc.Layer.extend({
         winscore*=2;
       }
     }
-    //console.log(winscore)
+    console.log(winscore)
 
     //清一色
     var isqing=0;
@@ -1638,7 +1673,7 @@ var PlayLayer = cc.Layer.extend({
     if (isqing>0) {
       winscore*=2;
     }
-    //console.log(winscore)
+    console.log(winscore)
 
     //龙
     var long=false;
@@ -1650,9 +1685,9 @@ var PlayLayer = cc.Layer.extend({
       long=true;
     }
     if (long) {winscore*=2;}
-    if (long && isqing>0) {winscore*=2;}
-    // console.log(winscore);
+    console.log(winscore);
     
+    //如果是自摸，每个人都减，否则点炮人城堡
     if (winner==loser) {
      for (var i = 0; i < 4; i++) {
        if (winner==i) {
@@ -1761,7 +1796,7 @@ var PlayLayer = cc.Layer.extend({
      // window.playscene.unscheduleAllCallbacks();
   },
 
-  AddPai:function(paitype){
+  AddPai:function(paitype,fromseat){
     var _this=this;
     console.log('add',paitype)
     _this["player1"].push(paitype);
@@ -1769,7 +1804,7 @@ var PlayLayer = cc.Layer.extend({
      window.isPlay=true;
     _this.player1list[paitype]++;
     //console.log(_this.player1list);
-    _this.checkChoose(paitype,true);
+    _this.checkChoose(paitype,true,fromseat);
      console.log('pai length ',window.playscene.player1pai.length);
 
     _this.showCountDown(_this.turncountdown,function(){
