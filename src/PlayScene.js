@@ -52,7 +52,8 @@ var PlayLayer = cc.Layer.extend({
   seat:null,
   turncountdown:200,
   waitcountdown:3,
-  sockt_server:"ws://127.0.0.1:3010",
+  sockt_server:"ws://www.legendream.cn:3010",
+  api_server:"http://www.legendream.cn:3010",
   ctor:function (stagenum) {
       this._super();
       var _this=this;
@@ -446,7 +447,7 @@ var PlayLayer = cc.Layer.extend({
       var playernum=4;
       var openid='121177';
       this.playerid=openid;
-      Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
+      Utils.post(_this.api_server+"/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
         if (res.code==1) {
           _this.roomid=res.data.roomid;
@@ -2016,7 +2017,7 @@ var PlayLayer = cc.Layer.extend({
     _this.player2pengpai=[];
     _this.player3pengpai=[];
     _this.player4pengpai=[];
-
+	_this.player1=[];
     this.hideChoose();
 
   },
