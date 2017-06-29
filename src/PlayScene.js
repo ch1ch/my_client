@@ -279,7 +279,7 @@ var PlayLayer = cc.Layer.extend({
     });
 
     sioclient.on('gameinfo', function (userName, msg) {
-      //console.log('gameinfo',userName,msg);
+      console.log('gameinfo',userName,msg);
       if (msg.code==3) {//code 3游戏开始
         if (_this.player1.length>0) {
           return false;
@@ -2016,7 +2016,7 @@ var PlayLayer = cc.Layer.extend({
     _this.player2pengpai=[];
     _this.player3pengpai=[];
     _this.player4pengpai=[];
-
+    _this.player1=[];
     this.hideChoose();
 
   },
