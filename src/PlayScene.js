@@ -759,7 +759,7 @@ var PlayLayer = cc.Layer.extend({
 
   initPlayer4:function(posy){
     var _this=this;
-    var posx=1090;
+    var posx=1100;
     // var posy=690;
     // for (var i = 0; i < 13; i++) {
       var thing = new cc.Sprite(res.p_ui_rightpai);
@@ -1102,7 +1102,7 @@ var PlayLayer = cc.Layer.extend({
     var p4_posy=670-(_this.player4peng*128+_this.player4gang*168);
     
     _this.player4peng++;
-    var posx=1090;
+    var posx=1100;
     for (var i = 1; i < 4; i++) {
       if (i==1&&fromseat==2) {
         var thing = new PaiSprite(res["p_pai"+paitype]);
@@ -1339,7 +1339,7 @@ var PlayLayer = cc.Layer.extend({
     var p4_posy=670-(_this.player4gang*168);
     
     _this.player4gang++;
-    var posx=1090;
+    var posx=1100;
     for (var i = 1; i < 4; i++) {
       if (i==1) {
         var thing = new PaiSprite(res["p_pai"+paitype]);
@@ -1985,6 +1985,41 @@ var PlayLayer = cc.Layer.extend({
       }
     };
 
+
+     for (var i =_this.player1gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player1gangpai[i] != "undefined"){
+        _this.player1gangpai[i].removeFromParent();
+        _this.player1gangpai[i] = undefined;
+        _this.player1gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player2gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player2gangpai[i] != "undefined"){
+        _this.player2gangpai[i].removeFromParent();
+        _this.player2gangpai[i] = undefined;
+        _this.player2gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player3gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player3gangpai[i] != "undefined"){
+        _this.player3gangpai[i].removeFromParent();
+        _this.player3gangpai[i] = undefined;
+        _this.player3gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player4gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player4gangpai[i] != "undefined"){
+        _this.player4gangpai[i].removeFromParent();
+        _this.player4gangpai[i] = undefined;
+        _this.player4gangpai.splice(i,1);
+      }
+    };
+
+
+
     var bighuimg = _this.getChildByName("hubig_menu");
     _this.removeChild(bighuimg); 
     
@@ -2017,8 +2052,19 @@ var PlayLayer = cc.Layer.extend({
     _this.player2pengpai=[];
     _this.player3pengpai=[];
     _this.player4pengpai=[];
+    _this.player1gang:0,
+    _this.player2gang:0,
+    _this.player3gang:0,
+    _this.player4gang:0,
+    _this.player1gangpai:[],
+    _this.player2gangpai:[],
+    _this.player3gangpai:[],
+    _this.player4gangpai:[],
+    _this.player1ganglist:[],
+
     _this.player1=[];
     this.hideChoose();
+
 
   },
  
