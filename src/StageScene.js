@@ -62,6 +62,7 @@
             console.log(theuser);
             _this.userid=theuser.id;
             userinfo.setString('ID:'+theuser.id+" 昵称："+theuser.name);
+            setCookie('userid',theuser.id);
             cardnum.setString(theuser.card);
           });
 
@@ -95,10 +96,10 @@
         res.s_join,
         res.s_join,
         function () {
-          _this.addChild(joinbg, 35);
+          //_this.addChild(joinbg, 35);
 
-          // var transition=new cc.TransitionPageTurn(1,new PlayScene(0),false);
-          // cc.director.runScene( new PlayScene(2) );
+          var transition=new cc.TransitionPageTurn(1,new PlayScene(0),false);
+          cc.director.runScene( new PlayScene(2) );
         }, this);
         joinRoomItem.attr({
          x: 850,
@@ -125,7 +126,7 @@
         var joinbg = new cc.Menu(joinshowItem);
         joinbg.x = 0;
         joinbg.y = 0;
-        _this.addChild(joinbg, 35);
+        //_this.addChild(joinbg, 35);
 
 
 

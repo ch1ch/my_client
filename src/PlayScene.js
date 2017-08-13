@@ -63,6 +63,9 @@ var PlayLayer = cc.Layer.extend({
       var size = cc.winSize;
       
       var firstload=true;
+      this.imgurl=getCookie('headimgurl');
+      this.openid=getCookie('openid');
+      this.nickname=getCookie('nickname');
       // add bg
       this.bgSprite = new cc.Sprite(res.p_bk);
       this.bgSprite.attr({
@@ -438,14 +441,14 @@ var PlayLayer = cc.Layer.extend({
      // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
     //   console.log(res);
     // });
-      var time=Date.now();
+      var time=Date.now();     
 
       var imghead="res/play/ui/header.png";
       var playername="张三";
       var gametype=1;
       var rule='123';
       var playernum=4;
-      var openid='121177';
+      var openid=_this.openid;
       this.playerid=openid;
       Utils.post(_this.api_server+"/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
@@ -2052,15 +2055,15 @@ var PlayLayer = cc.Layer.extend({
     _this.player2pengpai=[];
     _this.player3pengpai=[];
     _this.player4pengpai=[];
-    _this.player1gang:0,
-    _this.player2gang:0,
-    _this.player3gang:0,
-    _this.player4gang:0,
-    _this.player1gangpai:[],
-    _this.player2gangpai:[],
-    _this.player3gangpai:[],
-    _this.player4gangpai:[],
-    _this.player1ganglist:[],
+    _this.player1gang=0;
+    _this.player2gang=0;
+    _this.player3gang=0;
+    _this.player4gang=0;
+    _this.player1gangpai=[];
+    _this.player2gangpai=[];
+    _this.player3gangpai=[];
+    _this.player4gangpai=[];
+    _this.player1ganglist=[];
 
     _this.player1=[];
     this.hideChoose();
