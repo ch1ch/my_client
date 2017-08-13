@@ -89,6 +89,9 @@ canvas {
 </head>
 <body>
 <!-- <script src="res/loading.js"></script> -->
+<form id="form" action="http://trans.palmf.cn/sdk/api/v1.0/cli/order_h5/0" method="post">
+    <input type="hidden" id="orderInfo" name="orderInfo" value="">
+  </form>
 <canvas id="gameCanvas" width="480" height="720"></canvas>
 <script>
     (function () {
@@ -108,9 +111,111 @@ canvas {
             }
         }
     })();
+  function setCookie(c_name,value,expiredays)
+  {
+    var exdate=new Date()
+    exdate.setDate(exdate.getDate()+expiredays)
+    document.cookie=c_name+ "=" +escape(value)+
+    ((expiredays==null) ? "" : ";expires="+exdate.toGMTString())
+  }
+
+  function getCookie(c_name)
+  {
+  if (document.cookie.length>0)
+    {
+    c_start=document.cookie.indexOf(c_name + "=")
+    if (c_start!=-1)
+      { 
+      c_start=c_start + c_name.length+1 
+      c_end=document.cookie.indexOf(";",c_start)
+      if (c_end==-1) c_end=document.cookie.length
+      return unescape(document.cookie.substring(c_start,c_end))
+      } 
+    }
+  return ""
+  }
+
+  setCookie('headimgurl','http://wx.qlogo.cn/mmopen/mia54phWuEaibj8eNcMVuBMBCwh6qfD6LbXFKiazNdK7GxssznMcx4F6atFO164rW2k2V1QE7BASuOWPibR17SicN7w/0');
+  setCookie('nickname','传传');
+  setCookie('openid','oIrAps3LRdZIvvEHLQfKAx67pZiI');
+  var hosturl='localhost';
+
 </script>
 <script src="frameworks/cocos2d-html5/CCBoot.js"></script>
-<!-- <script src="lib/jquery-1.10.1.min.js"></script> -->
+<script src="lib/jquery-1.11.3.min.js"></script>
+<script src="lib/mtjsencrypt.min.js"></script>
+<script type="text/javascript">
+
+  (function(){
+    var timestamp=new Date().getTime();
+    $("#mchntOrderNo").val("ceshi"+timestamp);
+  })
+
+  function submitOrder(money,ordernum){
+    var version='api_NoEncrypt';//传此值时，平台返回明文参数，否则返回密文参数
+    var subject='房卡';
+    var mchntOrderNo=ordernum;
+    var amount=money;
+    var appid='0000001047';
+    var key='469519ad66a9964fe7cd0573a2d688f0';
+    var body='购买房卡';
+    var clientIp='192.168.1.1';
+    var notifyUrl='http://www.legendream.cn/maj/';
+    var returnUrl='http://www.legendream.cn/maj/';
+    var signature='';
+    var jsonStr='{';
+    //请求参数都按照名称字符升序排列
+    if(amount!=''&&$.trim(amount).length>0){
+      jsonStr+='"amount":"'+amount+'",';
+      signature+='amount='+amount+'&'
+    }
+    if(appid!=''&&$.trim(appid).length>0){
+      jsonStr+='"appid":"'+appid+'",';
+      signature+='appid='+appid+'&'
+    }
+    if(body!=''&&$.trim(body).length>0){
+      jsonStr+='"body":"'+body+'",';
+      signature+='body='+body+'&'
+    }
+    if(clientIp!=''&&$.trim(clientIp).length>0){
+      jsonStr+='"clientIp":"'+clientIp+'",';
+      signature+='clientIp='+clientIp+'&'
+    }
+    if(mchntOrderNo!=''&&$.trim(mchntOrderNo).length>0){
+      jsonStr+='"mchntOrderNo":"'+mchntOrderNo+'",';
+      signature+='mchntOrderNo='+mchntOrderNo+'&'
+    }
+    
+    if(notifyUrl!=''&&$.trim(notifyUrl).length>0){
+      jsonStr+='"notifyUrl":"'+notifyUrl+'",';
+      signature+='notifyUrl='+notifyUrl+'&'
+    }
+    if(returnUrl!=''&&$.trim(returnUrl).length>0){
+      jsonStr+='"returnUrl":"'+returnUrl+'",';
+      signature+='returnUrl='+returnUrl+'&'
+    }
+    if(subject!=''&&$.trim(subject).length>0){
+      jsonStr+='"subject":"'+subject+'",';
+      signature+='subject='+subject+'&'
+    }
+    if(version!=''&&$.trim(version).length>0){
+      jsonStr+='"version":"'+version+'",';
+      signature+='version='+version+'&'
+    }
+    if(key!=''&&$.trim(key).length>0){
+      signature+='key='+key
+    }
+    if(signature!=''&&$.trim(signature).length>0){
+      jsonStr+='"signature":"'+signature+'",';
+    }
+    
+    jsonStr=jsonStr.substring(0,jsonStr.length-1);
+    jsonStr+='}';
+    var result =mtEncryptAndMD5(jsonStr);
+    $("#orderInfo").val(result);
+    document.getElementById('form').submit();
+  }
+</script>
 <!-- <script src="cocos2d-js-v3.13.js"></script> -->
 <script cocos src="main.js"></script>
 </body>

@@ -73,7 +73,7 @@ cc.game.onStart = function(){
     // cc.screen.requestFullScreen(targetElement, onFullScreenCallback);
     //load resources
     cc.LoaderScene.preload(g_resources, function () {
-        cc.director.runScene(new StartScene(1));
+        cc.director.runScene(new StageScene(1));
     }, this);
 };
 cc.game.run();

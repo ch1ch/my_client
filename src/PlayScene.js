@@ -446,7 +446,7 @@ var PlayLayer = cc.Layer.extend({
       var playernum=4;
       var openid='121177';
       this.playerid=openid;
-      Utils.post("http://localhost:3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
+      Utils.post("http://"+hosturl+":3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
         if (res.code==1) {
           _this.roomid=res.data.roomid;
