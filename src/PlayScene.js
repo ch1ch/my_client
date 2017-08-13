@@ -52,7 +52,8 @@ var PlayLayer = cc.Layer.extend({
   seat:null,
   turncountdown:200,
   waitcountdown:3,
-  sockt_server:"ws://127.0.0.1:3010",
+  sockt_server:"ws://"+hosturl+":3010",
+  api_server:"http://"+hosturl+":3010",
   ctor:function (stagenum) {
       this._super();
       var _this=this;
@@ -279,7 +280,7 @@ var PlayLayer = cc.Layer.extend({
     });
 
     sioclient.on('gameinfo', function (userName, msg) {
-      //console.log('gameinfo',userName,msg);
+      console.log('gameinfo',userName,msg);
       if (msg.code==3) {//code 3游戏开始
         if (_this.player1.length>0) {
           return false;
@@ -446,7 +447,7 @@ var PlayLayer = cc.Layer.extend({
       var playernum=4;
       var openid='121177';
       this.playerid=openid;
-      Utils.post("http://"+hosturl+":3010/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
+      Utils.post(_this.api_server+"/api/addroom.api",{time:time,hoster:openid,gametype:gametype,rule:rule},function(res){
         console.log(res);
         if (res.code==1) {
           _this.roomid=res.data.roomid;
@@ -758,7 +759,7 @@ var PlayLayer = cc.Layer.extend({
 
   initPlayer4:function(posy){
     var _this=this;
-    var posx=1090;
+    var posx=1100;
     // var posy=690;
     // for (var i = 0; i < 13; i++) {
       var thing = new cc.Sprite(res.p_ui_rightpai);
@@ -1101,7 +1102,7 @@ var PlayLayer = cc.Layer.extend({
     var p4_posy=670-(_this.player4peng*128+_this.player4gang*168);
     
     _this.player4peng++;
-    var posx=1090;
+    var posx=1100;
     for (var i = 1; i < 4; i++) {
       if (i==1&&fromseat==2) {
         var thing = new PaiSprite(res["p_pai"+paitype]);
@@ -1338,7 +1339,7 @@ var PlayLayer = cc.Layer.extend({
     var p4_posy=670-(_this.player4gang*168);
     
     _this.player4gang++;
-    var posx=1090;
+    var posx=1100;
     for (var i = 1; i < 4; i++) {
       if (i==1) {
         var thing = new PaiSprite(res["p_pai"+paitype]);
@@ -1984,6 +1985,41 @@ var PlayLayer = cc.Layer.extend({
       }
     };
 
+
+     for (var i =_this.player1gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player1gangpai[i] != "undefined"){
+        _this.player1gangpai[i].removeFromParent();
+        _this.player1gangpai[i] = undefined;
+        _this.player1gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player2gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player2gangpai[i] != "undefined"){
+        _this.player2gangpai[i].removeFromParent();
+        _this.player2gangpai[i] = undefined;
+        _this.player2gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player3gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player3gangpai[i] != "undefined"){
+        _this.player3gangpai[i].removeFromParent();
+        _this.player3gangpai[i] = undefined;
+        _this.player3gangpai.splice(i,1);
+      }
+    };
+
+    for (var i =_this.player4gangpai.length-1; i >= 0; i--) {
+      if (typeof  _this.player4gangpai[i] != "undefined"){
+        _this.player4gangpai[i].removeFromParent();
+        _this.player4gangpai[i] = undefined;
+        _this.player4gangpai.splice(i,1);
+      }
+    };
+
+
+
     var bighuimg = _this.getChildByName("hubig_menu");
     _this.removeChild(bighuimg); 
     
@@ -2016,8 +2052,19 @@ var PlayLayer = cc.Layer.extend({
     _this.player2pengpai=[];
     _this.player3pengpai=[];
     _this.player4pengpai=[];
+    _this.player1gang:0,
+    _this.player2gang:0,
+    _this.player3gang:0,
+    _this.player4gang:0,
+    _this.player1gangpai:[],
+    _this.player2gangpai:[],
+    _this.player3gangpai:[],
+    _this.player4gangpai:[],
+    _this.player1ganglist:[],
 
+    _this.player1=[];
     this.hideChoose();
+
 
   },
  
