@@ -443,8 +443,6 @@ var PlayLayer = cc.Layer.extend({
     // });
       var time=Date.now();     
 
-      var imghead="res/play/ui/header.png";
-      var playername="张三";
       var gametype=1;
       var rule='123';
       var playernum=4;
@@ -454,14 +452,16 @@ var PlayLayer = cc.Layer.extend({
         console.log(res);
         if (res.code==1) {
           _this.roomid=res.data.roomid;
-          _this.creatRoomSocket(openid,res.data.roomid,gametype,rule,playernum,imghead,playername);
+          _this.creatRoomSocket(openid,res.data.roomid,gametype,rule,playernum);
         }
       });      
   },
 
-  creatRoomSocket: function(userid,roomid,gametype,rule,playernum,imghead,playername) {
+  creatRoomSocket: function(userid,roomid,gametype,rule,playernum) {
     //console.log(roomid,userid);
     var _this=this;
+    var imghead=_this.imgurl;
+    var playername=_this.nickname;
     var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});     
     this.initPlayer1info(imghead,playername); 
     sioclient.on("connect", function() {
@@ -494,15 +494,17 @@ var PlayLayer = cc.Layer.extend({
   initPlayer1info:function(imghead,name){
     var _this=this;
     var size = cc.winSize;
-    var player1head = new cc.Sprite(imghead);
-    player1head.attr({
-       x: 140,
-       y: 190,
-    });
-    player1head.setScaleX(90/player1head.getContentSize().width);
-    player1head.setScaleY(90/player1head.getContentSize().height);
-    this.addChild(player1head, 5);
 
+    cc.loader.loadImg(imghead, {isCrossOrigin:true }, function(err,img){
+      var player1head = new cc.Sprite(img);
+      player1head.attr({
+         x: 140,
+         y: 190,
+      });
+      player1head.setScaleX(90/player1head.getContentSize().width);
+      player1head.setScaleY(90/player1head.getContentSize().height);
+      _this.addChild(player1head, 5);
+    });
 
     this.player1nameLabel = new cc.LabelTTF(name, "Arial", 24);
     this.player1nameLabel.attr({
@@ -520,16 +522,16 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var size = cc.winSize;
 
-    //player2
-    var player2head = new cc.Sprite(imghead);
-    player2head.attr({
-       x: 60,
+    cc.loader.loadImg(imghead, {isCrossOrigin:true }, function(err,img){
+      var player1head = new cc.Sprite(img);
+      player1head.attr({
+         x: 60,
        y: 480,
-       anchorX: 0,
+      });
+      player1head.setScaleX(90/player1head.getContentSize().width);
+      player1head.setScaleY(90/player1head.getContentSize().height);
+      _this.addChild(player1head, 5);
     });
-    player2head.setScaleX(90/player2head.getContentSize().width);
-    player2head.setScaleY(90/player2head.getContentSize().height);
-    this.addChild(player2head, 5);
 
     this.player2nameLabel = new cc.LabelTTF(name, "Arial", 24);
     this.player2nameLabel.attr({
@@ -547,16 +549,17 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var size = cc.winSize;
 
-    //player3
-    var player3head = new cc.Sprite(imghead);
-    player3head.attr({
-      x: size.width*0.26,
-      y: size.height *0.9,
-       anchorX: 0,
+    cc.loader.loadImg(imghead, {isCrossOrigin:true }, function(err,img){
+      var player1head = new cc.Sprite(img);
+      player1head.attr({
+        x: size.width*0.26,
+        y: size.height *0.9,
+        anchorX: 0,
+      });
+      player1head.setScaleX(90/player1head.getContentSize().width);
+      player1head.setScaleY(90/player1head.getContentSize().height);
+      _this.addChild(player1head, 5);
     });
-    player3head.setScaleX(90/player3head.getContentSize().width);
-    player3head.setScaleY(90/player3head.getContentSize().height);
-    this.addChild(player3head, 5);
 
     this.player3nameLabel = new cc.LabelTTF(name, "Arial", 24);
     this.player3nameLabel.attr({
@@ -573,16 +576,17 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var size = cc.winSize;
 
-    //player4
-    var player4head = new cc.Sprite(imghead);
-    player4head.attr({
-      x: size.width*0.9,
-      y: size.height *0.65,
-       anchorX: 0,
+    cc.loader.loadImg(imghead, {isCrossOrigin:true }, function(err,img){
+      var player1head = new cc.Sprite(img);
+      player1head.attr({
+        x: size.width*0.9,
+        y: size.height *0.65,
+        anchorX: 0,
+      });
+      player1head.setScaleX(90/player1head.getContentSize().width);
+      player1head.setScaleY(90/player1head.getContentSize().height);
+      _this.addChild(player1head, 5);
     });
-    player4head.setScaleX(90/player4head.getContentSize().width);
-    player4head.setScaleY(90/player4head.getContentSize().height);
-    this.addChild(player4head, 5);
 
     this.player4nameLabel = new cc.LabelTTF(name, "Arial", 24);
     this.player4nameLabel.attr({
