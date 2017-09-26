@@ -37,7 +37,7 @@ $signPackage = $jssdk->GetSignPackage();
     // $openid="abcde1234567890";
     // setcookie("openid", $openid);
     header("Content-Type:text/html;charset=utf-8");
-    $url = "http://www.legendream.cn/maj2/index.html";  
+    $url = "http://www.legendream.cn/majiang/index.html";  
     echo "<script type='text/javascript'>";  
     echo "window.location.href='$url'";  
     echo "</script>"; 

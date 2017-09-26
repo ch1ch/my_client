@@ -135,9 +135,9 @@ canvas {
   return ""
   }
 
-  setCookie('headimgurl','http://wx.qlogo.cn/mmopen/mia54phWuEaibj8eNcMVuBMBCwh6qfD6LbXFKiazNdK7GxssznMcx4F6atFO164rW2k2V1QE7BASuOWPibR17SicN7w/0');
-  setCookie('nickname','传传');
-  setCookie('openid','oIrAps3LRdZIvvEHLQfKAx67pZiI');
+  // setCookie('headimgurl','http://wx.qlogo.cn/mmopen/mia54phWuEaibj8eNcMVuBMBCwh6qfD6LbXFKiazNdK7GxssznMcx4F6atFO164rW2k2V1QE7BASuOWPibR17SicN7w/0');
+  // setCookie('nickname','传传');
+  // setCookie('openid','oIrAps3LRdZIvvEHLQfKAx67pZiI');
   var hosturl='localhost';
 
 </script>
@@ -161,7 +161,7 @@ canvas {
     var body='购买房卡';
     var clientIp='192.168.1.1';
     var notifyUrl='http://www.legendream.cn/maj/';
-    var returnUrl='http://www.legendream.cn/maj/';
+    var returnUrl='http://www.legendream.cn/majiang/cashback.php?orderid='+ordernum+'&money='+amount+'&openid='+getCookie('openid');
     var signature='';
     var jsonStr='{';
     //请求参数都按照名称字符升序排列

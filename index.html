@@ -161,7 +161,7 @@ canvas {
     var body='购买房卡';
     var clientIp='192.168.1.1';
     var notifyUrl='http://www.legendream.cn/maj/';
-    var returnUrl='http://www.legendream.cn/maj/';
+    var returnUrl='http://www.legendream.cn/majiang/cashback.php?orderid='+ordernum+'&money='+amount+'&openid='+getCookie('openid');
     var signature='';
     var jsonStr='{';
     //请求参数都按照名称字符升序排列
