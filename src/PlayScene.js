@@ -54,12 +54,11 @@ var PlayLayer = cc.Layer.extend({
   waitcountdown:3,
   sockt_server:"ws://"+hosturl+":3010",
   api_server:"http://"+hosturl+":3010",
-  ctor:function (stagenum) {
+  ctor:function (stagenum,theroomId) {
       this._super();
       var _this=this;
       this.score=0;
       var timecount=0.01;//刷新频率
-
       var size = cc.winSize;
       
       var firstload=true;
@@ -120,6 +119,15 @@ var PlayLayer = cc.Layer.extend({
         res.p_ui_back,
         function () {
           console.log("back is clicked!");
+          var sioclient= _this._sioClient ;
+          sioclient.on('disconnect', function(){
+            console.log('user disconnected');
+            
+          });
+          var transition=new cc.TransitionPageTurn(1,new StageScene(),false);
+            cc.director.runScene( transition);
+
+          
           
         }, this);
       backItem.attr({
@@ -155,7 +163,8 @@ var PlayLayer = cc.Layer.extend({
       if (stagenum==1) {
         this.gamestartClicked()
       }else  if (stagenum==2) {
-        this.onMenuSIOClientClicked();
+        console.log(theroomId);
+        this.joinTheGame(theroomId);
       }
      //玩家信息
       //_this.initLayer();
@@ -168,47 +177,6 @@ var PlayLayer = cc.Layer.extend({
 
       this._super();
   },
-  initLayer:function() {
-    var size = cc.winSize;
-
-      var menuRequest = new cc.Menu();
-      menuRequest.setPosition(cc.p(0, 0));
-      this.addChild(menuRequest,50);
-      var winSize = cc.director.getWinSize();
-      MARGIN = 46;
-      var SPACE = 46;
-      var vspace = 80;
-
-        // Test to create basic client in the default namespace
-      var labelSIOClient = new cc.LabelTTF("join game", "Arial", 38);
-      labelSIOClient.setAnchorPoint(cc.p(0,0));
-      var itemSIOClient = new cc.MenuItemLabel(labelSIOClient, this.onMenuSIOClientClicked, this);
-      itemSIOClient.setPosition(cc.p(labelSIOClient.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - SPACE));
-      menuRequest.addChild(itemSIOClient,50);
-
-      // Test sending message to default namespace
-      var labelTestMessage = new cc.LabelTTF("clean user", "Arial", 38);
-      labelTestMessage.setAnchorPoint(cc.p(0,0));
-      var itemTestMessage = new cc.MenuItemLabel(labelTestMessage, this.onMenuTestMessageClicked, this);
-      itemTestMessage.setPosition(cc.p(labelTestMessage.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 2 * SPACE));
-      menuRequest.addChild(itemTestMessage);
-
-      // Test sending event 'echotest' to default namespace
-      var labelTestEvent = new cc.LabelTTF("new game", "Arial", 38);
-      labelTestEvent.setAnchorPoint(cc.p(0,0));
-      var itemTestEvent = new cc.MenuItemLabel(labelTestEvent, this.newGame, this);
-      itemTestEvent.setPosition(cc.p(labelTestEvent.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 3 * SPACE));
-      menuRequest.addChild(itemTestEvent);
-
-
-      var labelSIOEndpoint = new cc.LabelTTF("creat game", "Arial", 45);
-      labelSIOEndpoint.setAnchorPoint(cc.p(0,0));
-      var itemSIOEndpoint = new cc.MenuItemLabel(labelSIOEndpoint, this.gamestartClicked, this);
-      itemSIOEndpoint.setPosition(cc.p(labelSIOEndpoint.getContentSize().width / 2 + MARGIN, winSize.height - MARGIN - 4 * SPACE));
-      menuRequest.addChild(itemSIOEndpoint);          
-     
-  },
- 
   socketinit:function(){
     var _this=this;
     var sioclient= _this._sioClient ;
@@ -465,7 +433,7 @@ var PlayLayer = cc.Layer.extend({
     var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});     
     this.initPlayer1info(imghead,playername); 
     sioclient.on("connect", function() {
-          console.log('Connected!');
+          console.log('Connected!',roomid);
           sioclient.emit('roominfo',_this.roomid,{code:2,gametype:gametype,rule:rule,playernum:playernum,userid:userid,imghead:imghead});
           sioclient.emit('join',roomid,{playerid:userid,imghead:imghead,playername:playername});
       });
@@ -473,10 +441,11 @@ var PlayLayer = cc.Layer.extend({
     this.socketinit();
   },
 
-  onMenuSIOClientClicked: function(sender) {
+  joinTheGame: function(theroomId) {
+    console.log(theroomId);
     var _this=this;
     var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});
-    var roomID=355033;
+    var roomID=theroomId;
     var playerID='778899';
     var imghead="res/play/ui/header.png";
     var playername="张si";
@@ -2547,15 +2516,15 @@ var PlayLayer = cc.Layer.extend({
 });
 
 var PlayScene = cc.Scene.extend({
-   ctor:function (data) 
+   ctor:function (data,data2) 
     {
       this._super();
-      this.init(data);
+      this.init(data,data2);
     },
 
-    init:function (data) 
+    init:function (data,data2) 
     {
-      var layer = new PlayLayer(data);
+      var layer = new PlayLayer(data,data2);
         this.addChild(layer);
     }
 

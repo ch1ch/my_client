@@ -3,6 +3,7 @@
     title_bg:null,
     title_:null,
     joinnumarr:[],
+    roomnum:"",
       ctor:function () {
           this._super();
 
@@ -43,9 +44,6 @@
           });
           this.addChild(cardnum, 30);
 
-          
-          
-       
           cc.loader.loadImg(imgurl, {isCrossOrigin:true }, function(err,img){
             var headimg = new cc.Sprite(img);
             headimg.attr({
@@ -96,10 +94,9 @@
         res.s_join,
         res.s_join,
         function () {
-          //_this.addChild(joinbg, 35);
+          _this.addChild(joinbg, 35);
 
-          var transition=new cc.TransitionPageTurn(1,new PlayScene(0),false);
-          cc.director.runScene( new PlayScene(2) );
+         
         }, this);
         joinRoomItem.attr({
          x: 850,
@@ -126,7 +123,7 @@
         var joinbg = new cc.Menu(joinshowItem);
         joinbg.x = 0;
         joinbg.y = 0;
-        //_this.addChild(joinbg, 35);
+        // _this.addChild(joinbg, 35);
 
 
 
@@ -200,6 +197,7 @@
 
         function enterjoinnum(num){
           if (_this.joinnums<5) {
+            _this.roomnum+=num;
             _this.joinnumarr[_this.joinnums].setString(num);
             _this.joinnums++;
           }
@@ -367,6 +365,8 @@
           if (_this.joinnums>0) {
             _this.joinnums--;
             _this.joinnumarr[_this.joinnums].setString('');
+             _this.roomnum=_this.roomnum.slice(0, (_this.joinnums));
+           
             
           }
         }, this);
@@ -402,7 +402,21 @@
         res.s_joinsure,
         res.s_joinsure,
         function () {
+          console.log(_this.joinnums);
+          console.log(_this.joinnumarr);
+          console.log(_this.roomnum);
+          Utils.get("http://"+hosturl+":3010/api/joinroom.api",{openid:openid,roomid:_this.roomnum},function(res){
+            console.log(res);
+            if (res.code==1) {
+              var transition=new cc.TransitionPageTurn(1,new PlayScene(0),false);
+              cc.director.runScene( new PlayScene(2,_this.roomnum) );
+            }else{
+              alert("房间号错误，请重新输入");
+            };
+          });
 
+
+         
         }, this);
         joinItemsure.attr({
          x: 450,
@@ -414,8 +428,6 @@
         joinbtnsure.x = 0;
         joinbtnsure.y = 0;
         joinshowItem.addChild(joinbtnsure, 25);
-
-
 
 
         var shopItem = new cc.MenuItemImage(
@@ -545,7 +557,6 @@
         shopbtn4.x = 0;
         shopbtn4.y = 0;
         shopshowItem.addChild(shopbtn4, 25);
-
 
 
 
