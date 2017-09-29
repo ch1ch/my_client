@@ -27,12 +27,12 @@ $signPackage = $jssdk->GetSignPackage();
     $userUrl="https://api.weixin.qq.com/sns/userinfo?access_token=$token&openid=$openid&lang=zh_CN";
     $userInfo = getJson($userUrl);
     //echo $userInfo;
-    //echo '关注的用户名：'.$userInfo['nickname'];
-    //echo '头像:  '.$userInfo['headimgurl'];
+   //  echo '关注的用户名：'.$userInfo['nickname'];
+   //  echo '头像:  '.$userInfo['headimgurl'];
    // echo '<br>openid:  '.$userInfo['openid'];
-     setcookie("openid", $openid);
+     setcookie("openid", urlencode($openid));
      setcookie("headimgurl", $userInfo['headimgurl']);
-     setcookie("nickname",$userInfo['nickname']);
+     setcookie("nickname",urlencode($userInfo['nickname']));
 
     // $openid="abcde1234567890";
     // setcookie("openid", $openid);

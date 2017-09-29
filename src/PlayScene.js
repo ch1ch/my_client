@@ -2,6 +2,8 @@ var SocketIO = SocketIO || io;
 var PlayLayer = cc.Layer.extend({
   _statusLabel:null,
   _broadcastLabel:null,
+  _gamenumLabel:null,
+  roomidLabel:null,
   _sioClient:null,
   bgSprite:null,
   timeLabel:null,
@@ -77,6 +79,19 @@ var PlayLayer = cc.Layer.extend({
       this.bgSprite.setScaleY(size.height/this.bgSprite.getContentSize().height);
       this.addChild(this.bgSprite, 0);
 
+      console.log(theroomId);
+
+      this.roomidLabel = new cc.LabelTTF('', "Arial", 30);
+      this.roomidLabel.attr({
+         x: size.width*0.1,
+         y: size.height *0.95,
+      });
+      this.roomidLabel.setFontFillColor(cc.color(255, 255, 255, 255)); 
+      this.addChild(this.roomidLabel, 3600);
+      if (theroomId) {
+        this.roomidLabel.setString('房间号：'+theroomId);
+      };
+      
       this.timeLabel = new cc.LabelTTF("0", "Arial", 60);
       this.timeLabel.attr({
          x: size.width*0.65,
@@ -126,9 +141,6 @@ var PlayLayer = cc.Layer.extend({
           });
           var transition=new cc.TransitionPageTurn(1,new StageScene(),false);
             cc.director.runScene( transition);
-
-          
-          
         }, this);
       backItem.attr({
          x: size.width*0.93,
@@ -398,12 +410,6 @@ var PlayLayer = cc.Layer.extend({
    
   },
 
-
-  onMenuTestMessageClicked: function(sender) {
-    var _this=this;
-    _this._sioClient.emit('gameinfo',_this.roomid,{code:14});
-  },    
-
   gamestartClicked: function(sender) {
     var _this=this;
      // Utils.get("http://localhost:3010/api/getuser.api",{id:12345},function(res){
@@ -420,6 +426,7 @@ var PlayLayer = cc.Layer.extend({
         console.log(res);
         if (res.code==1) {
           _this.roomid=res.data.roomid;
+          _this.roomidLabel.setString('房间号：'+res.data.roomid);
           _this.creatRoomSocket(openid,res.data.roomid,gametype,rule,playernum);
         }
       });      
@@ -446,9 +453,11 @@ var PlayLayer = cc.Layer.extend({
     var _this=this;
     var sioclient = SocketIO.connect(_this.sockt_server, {"force new connection" : true});
     var roomID=theroomId;
-    var playerID='778899';
-    var imghead="res/play/ui/header.png";
-    var playername="张si";
+
+    var playerID=_this.openid;
+    var imghead=_this.imgurl;
+    var playername= _this.nickname;
+    alert(playerID);
     this.roomid=roomID;
     this.playerid=playerID;
     this.initPlayer1info(imghead,playername);

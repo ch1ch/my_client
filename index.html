@@ -134,11 +134,21 @@ canvas {
     }
   return ""
   }
-
-  setCookie('headimgurl','http://wx.qlogo.cn/mmopen/mia54phWuEaibj8eNcMVuBMBCwh6qfD6LbXFKiazNdK7GxssznMcx4F6atFO164rW2k2V1QE7BASuOWPibR17SicN7w/0');
-  setCookie('nickname','传传');
-  setCookie('openid','oIrAps3LRdZIvvEHLQfKAx67pZiI');
+  if (getCookie("headimgurl")) {
+    var nickname=decodeURI(getCookie("nickname"));
+    var openid=decodeURI(getCookie("openid"));
+    setCookie('nickname',nickname);
+    setCookie('openid',openid);
+    // alert(getCookie("headimgurl"));
+    // alert(getCookie("nickname"));
+  }else{
+    setCookie('headimgurl','http://wx.qlogo.cn/mmopen/mia54phWuEaibj8eNcMVuBMBCwh6qfD6LbXFKiazNdK7GxssznMcx4F6atFO164rW2k2V1QE7BASuOWPibR17SicN7w/0');
+    setCookie('nickname','传传');
+    setCookie('openid','oIrAps3LRdZIvvEHLQfKAx67pZiI');
+  };
+  
   var hosturl='localhost';
+  var hosturl='www.legendream.cn';
 
 </script>
 <script src="frameworks/cocos2d-html5/CCBoot.js"></script>
