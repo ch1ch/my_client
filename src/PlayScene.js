@@ -135,12 +135,13 @@ var PlayLayer = cc.Layer.extend({
         function () {
           console.log("back is clicked!");
           var sioclient= _this._sioClient ;
-          sioclient.on('disconnect', function(){
-            console.log('user disconnected');
+          // sioclient.on('disconnect', function(){
+          //   console.log('user disconnected');
             
-          });
-          var transition=new cc.TransitionPageTurn(1,new StageScene(),false);
-            cc.director.runScene( transition);
+          // });
+           window.location = 'index.html';
+          // var transition=new cc.TransitionPageTurn(1, StageScene(),false);
+          //   cc.director.runScene( transition);
         }, this);
       backItem.attr({
          x: size.width*0.93,
@@ -455,9 +456,10 @@ var PlayLayer = cc.Layer.extend({
     var roomID=theroomId;
 
     var playerID=_this.openid;
+    // var playerID=43443546;
     var imghead=_this.imgurl;
     var playername= _this.nickname;
-    alert(playerID);
+    // alert(playerID);
     this.roomid=roomID;
     this.playerid=playerID;
     this.initPlayer1info(imghead,playername);

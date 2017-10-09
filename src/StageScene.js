@@ -59,9 +59,13 @@
             var theuser=res.data;
             console.log(theuser);
             _this.userid=theuser.id;
-            userinfo.setString('ID:'+theuser.id+" 昵称："+theuser.name);
+            if (theuser.name) {
+              userinfo.setString('ID:'+theuser.id+" 昵称："+theuser.name);
+              cardnum.setString(theuser.card);
+            }
+            
             setCookie('userid',theuser.id);
-            cardnum.setString(theuser.card);
+            
           });
 
           var cardbg = new cc.Sprite(res.s_cardbg);

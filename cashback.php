@@ -1,6 +1,6 @@
 <!doctype html>
 <?php
-$orderid=$_GET['orderid'];  //1502606534446
+$orderid=$_GET['orderid'];  //1506784842602
 $money=$_GET['money'];
 $openid=$_GET['openid'];
 $url='http://trans.palmf.cn/sdk/v1.0/payOrderResult/'.$orderid.'/0000001047';
@@ -11,20 +11,39 @@ echo '订单编号：'.$data->mchntOrderNo.'<br>';
 echo '充值金额：'.$data->amount.'<br>';
 $status=$data->paySt;
  if ($status==0) {//0:待支付
-    echo('订单状态：待支付');
+    echo('订单状态：待支付<br>');
   }else if ($status==1) {//1:支付中
-    echo('订单状态：支付中');
+    echo('订单状态：支付中<br>');
   }else if ($status==2) {//2:支付成功
-    echo('订单状态：支付成功');
+    echo('订单状态：支付成功<br>');
   }else if ($status==3) {//3:支付失败
-    echo('订单状态：支付失败');
+    echo('订单状态：支付失败<br>');
   }else if ($status==4) {//4：已关闭
-    echo('订单状态：已关闭');
+    echo('订单状态：已关闭<br>');
   };
 //$status=2;
 
 $url1='http://www.legendream.cn:3010/api/cashstatus.api?orderid='.$orderid.'&money='.$money.'&status='.$status.'&openid='.$openid;
 $html1 = file_get_contents($url1);
+$data1=json_decode($html1);
+$code=$data1->data->code;
+//echo '：'.$data1->data->msg.'<br>';
+//echo '：'.$code.'<br>';
+if ($code==1) {
+    header("Content-Type:text/html;charset=utf-8");
+    $url = "http://www.legendream.cn/majiang/index1.html";  
+    echo "<script type='text/javascript'>";  
+    echo 'alert("充值成功！");';  
+    echo "window.location.href='$url'";  
+    echo "</script>"; 
+}else{
+    header("Content-Type:text/html;charset=utf-8");
+    $url = "http://www.legendream.cn/majiang/index1.html";  
+    echo "<script type='text/javascript'>";  
+    echo 'alert("充值失败！");';  
+    echo "window.location.href='$url'";  
+    echo "</script>"; 
+}
 //echo $html1;
 
 
