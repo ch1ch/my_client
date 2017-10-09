@@ -599,10 +599,10 @@
 
 
         var scoreItem = new cc.MenuItemImage(
-        res.s_scorebtn,
-        res.s_scorebtn,
+        res.s_rankbtn,
+        res.s_rankbtn,
         function () {
-          
+            _this.addChild(rankbg, 35);
 
         }, this);
         scoreItem.attr({
@@ -615,6 +615,81 @@
         scorebtn.x = 0;
         scorebtn.y = 0;
         this.addChild(scorebtn, 25);
+
+
+        var rankshowItem = new cc.MenuItemImage(
+        res.s_rankbg,
+        res.s_rankbg,
+        function () {
+         _this.removeChild(rankbg, 35);
+        }, this);
+        rankshowItem.attr({
+          x: size.width / 2,
+          y: size.height / 2,
+        });
+        rankshowItem.setScaleX(size.width/rankshowItem.getContentSize().width);
+        rankshowItem.setScaleY(size.height/rankshowItem.getContentSize().height);
+        var rankbg = new cc.Menu(rankshowItem);
+        rankbg.x = 0;
+        rankbg.y = 0;
+
+
+
+        Utils.get("http://"+hosturl+":3010/api/getuserrank.api",{},function(res){
+            console.log(res);
+
+          if (res.code==1) {
+            for (var i = 0; i < res.data.length; i++) {
+              var obj=res.data[i];
+
+              var rankitemSprite = new cc.Sprite(res.s_rankitem);
+              rankitemSprite.attr({
+                 x: size.width *0.2,
+                 y: size.height *(0.15*i)
+              });
+              rankshowItem.addChild(rankitemSprite, 30);
+
+
+              var ranknum = new cc.LabelTTF((i+1), "Arial", 15);
+              ranknum.setColor(cc.color(255, 255, 255, 255)); 
+              ranknum.attr({
+                   x: size.width *0.1,
+                   y: size.height*(0.385-0.03*i),
+              });
+              rankshowItem.addChild(ranknum, 30);
+
+              var rankname = new cc.LabelTTF(obj.name, "Arial", 15);
+              rankname.setColor(cc.color(255, 255, 255, 255)); 
+              rankname.attr({
+                   x: size.width *0.2,
+                   y: size.height*(0.385-0.03*i),
+              });
+              rankshowItem.addChild(rankname, 30);
+
+               var rankname = new cc.LabelTTF(obj.totalmoney, "Arial", 15);
+              rankname.setColor(cc.color(255, 255, 255, 255)); 
+              rankname.attr({
+                   x: size.width *0.35,
+                   y: size.height*(0.385-0.03*i),
+              });
+              rankshowItem.addChild(rankname, 30);
+
+
+
+
+
+
+              
+            };
+            
+
+
+          };
+            
+            
+        });
+
+        
 
         var huodongItem = new cc.MenuItemImage(
         res.s_huodongbtn,
