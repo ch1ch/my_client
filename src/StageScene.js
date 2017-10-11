@@ -673,23 +673,11 @@
                    y: size.height*(0.385-0.03*i),
               });
               rankshowItem.addChild(rankname, 30);
-
-
-
-
-
-
               
             };
-            
-
 
           };
-            
-            
         });
-
-        
 
         var huodongItem = new cc.MenuItemImage(
         res.s_huodongbtn,
@@ -701,8 +689,6 @@
          x: 1000,
          y: 100
         });
-        // huodongItem.setScaleX(120/huodongItem.getContentSize().width);
-        // huodongItem.setScaleY(120/huodongItem.getContentSize().height);
         var Huodongbtn = new cc.Menu(huodongItem);
         Huodongbtn.x = 0;
         Huodongbtn.y = 0;
@@ -726,13 +712,93 @@
         Huodongbg.y = 0;
 
 
+        var huodong1Item = new cc.MenuItemImage(
+        res.s_huodong1,
+        res.s_huodong1,
+        function () {
+          huodongshowItem.addChild(huodong1text, 30);
+          huodongshowItem.removeChild(huodong2text, 30);
+          huodongshowItem.removeChild(huodong3text, 30);
+        }, this);
+        huodong1Item.attr({
+         x: 105,
+         y: 246
+        });
+        huodong1Item.setScaleX(90/huodong1Item.getContentSize().width);
+        huodong1Item.setScaleY(40/huodong1Item.getContentSize().height);
+        var huodong1btn = new cc.Menu(huodong1Item);
+        huodong1btn.x = 0;
+        huodong1btn.y = 0;
+        huodongshowItem.addChild(huodong1btn, 25);
+
+        var huodong1text = new cc.LabelTTF("最新活动最新活动最新活动最新活动", "Arial", 15);
+        huodong1text.setColor(cc.color(255, 255, 255, 255)); 
+        huodong1text.attr({
+             x: 300,
+             y: 230,
+        });
+        huodongshowItem.addChild(huodong1text, 30);
+
+        var huodong2Item = new cc.MenuItemImage(
+        res.s_huodong2,
+        res.s_huodong2,
+        function () {
+          huodongshowItem.removeChild(huodong1text, 30);
+          huodongshowItem.addChild(huodong2text, 30);
+          huodongshowItem.removeChild(huodong3text, 30);
+        }, this);
+        huodong2Item.attr({
+         x: 105,
+         y: 196
+        });
+        huodong2Item.setScaleX(90/huodong2Item.getContentSize().width);
+        huodong2Item.setScaleY(40/huodong2Item.getContentSize().height);
+        var huodong2btn = new cc.Menu(huodong2Item);
+        huodong2btn.x = 0;
+        huodong2btn.y = 0;
+        huodongshowItem.addChild(huodong2btn, 25);
+
+        var huodong2text = new cc.LabelTTF("我们的联系方式是", "Arial", 15);
+        huodong2text.setColor(cc.color(255, 255, 255, 255)); 
+        huodong2text.attr({
+             x: 300,
+             y: 230,
+        });
+        // huodongshowItem.addChild(huodong2text, 30);
+
+        var huodong3Item = new cc.MenuItemImage(
+        res.s_huodong3,
+        res.s_huodong3,
+        function () {
+          huodongshowItem.removeChild(huodong1text, 30);
+          huodongshowItem.removeChild(huodong2text, 30);
+          huodongshowItem.addChild(huodong3text, 30);
+        }, this);
+        huodong3Item.attr({
+         x: 105,
+         y: 146
+        });
+        huodong3Item.setScaleX(90/huodong3Item.getContentSize().width);
+        huodong3Item.setScaleY(40/huodong3Item.getContentSize().height);
+        var huodong3btn = new cc.Menu(huodong3Item);
+        huodong3btn.x = 0;
+        huodong3btn.y = 0;
+        huodongshowItem.addChild(huodong3btn, 25);
+
+        var huodong3text = new cc.LabelTTF("拒绝赌博，健康游戏", "Arial", 15);
+        huodong3text.setColor(cc.color(255, 255, 255, 255)); 
+        huodong3text.attr({
+             x: 300,
+             y: 230,
+        });
+        // huodongshowItem.addChild(huodong3text, 30);
+
 
         var systemItem = new cc.MenuItemImage(
         res.s_systembtn,
         res.s_systembtn,
         function () {
          _this.addChild(systembg, 35);
-          
 
         }, this);
         systemItem.attr({
@@ -741,12 +807,10 @@
          anchorX: 0.5,
          anchorY: 0.5
         });
-        // systemItem.setScaleX(110/systemItem.getContentSize().width);
-        // systemItem.setScaleY(120/systemItem.getContentSize().height);
         var systembtn = new cc.Menu(systemItem);
         systembtn.x = 0;
         systembtn.y = 0;
-        this.addChild(systembtn, 25);
+        // this.addChild(systembtn, 25);
 
         var systemshowItem = new cc.MenuItemImage(
         res.s_systembg,
@@ -765,6 +829,8 @@
         systembg.y = 0;
 
 
+
+
         var ruleItem = new cc.MenuItemImage(
         res.s_rulebtn,
         res.s_rulebtn,
@@ -776,8 +842,6 @@
          x: 1250,
          y: 600
         });
-        // ruleItem.setScaleX(130/ruleItem.getContentSize().width);
-        // ruleItem.setScaleY(90/ruleItem.getContentSize().height);
         var rulebtn = new cc.Menu(ruleItem);
         rulebtn.x = 0;
         rulebtn.y = 0;
@@ -799,20 +863,29 @@
         rulebg.x = 0;
         rulebg.y = 0;
 
-        var backItem = new cc.MenuItemImage(
-        res.s_backbtn,
-        res.s_backbtn,
-        function () {
-
-        }, this);
-        backItem.attr({
-         x: 1250,
-         y: 690
+        var ruletext = new cc.LabelTTF("游戏规则", "Arial", 15);
+        ruletext.setColor(cc.color(255, 255, 255, 255)); 
+        ruletext.attr({
+             x: 220,
+             y: 280,
         });
-        var backbtn = new cc.Menu(backItem);
-        backbtn.x = 0;
-        backbtn.y = 0;
-        this.addChild(backbtn, 25);
+        ruleshowItem.addChild(ruletext, 30);
+
+
+        // var backItem = new cc.MenuItemImage(
+        // res.s_backbtn,
+        // res.s_backbtn,
+        // function () {
+
+        // }, this);
+        // backItem.attr({
+        //  x: 1250,
+        //  y: 690
+        // });
+        // var backbtn = new cc.Menu(backItem);
+        // backbtn.x = 0;
+        // backbtn.y = 0;
+        // this.addChild(backbtn, 25);
 
         var backshowItem = new cc.MenuItemImage(
         res.s_backbg,
@@ -831,7 +904,6 @@
         backbg.y = 0;
 
 
-        // console.log("123");
 
 
         return true;
